@@ -35,7 +35,7 @@ public class ProductListPageServletTest {
     public void testDoGet() throws ServletException, IOException {
         servlet.doGet(request, response);
 
-        verify(request, times(1)).getRequestDispatcher("/WEB-INF/pages/productList.jsp");
+        verify(request).getRequestDispatcher("/WEB-INF/pages/productList.jsp");
         verify(requestDispatcher).forward(request, response);
     }
 }

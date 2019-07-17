@@ -28,7 +28,7 @@ public class ArrayListProductDaoTest {
         Product product = new Product();
         product.setPrice(new BigDecimal(-1));
         actualProductDao.save(product);
-        Assert.assertEquals(productDao.findProducts().size(), productDao.findProducts().size());
+        Assert.assertEquals(productDao.findProducts().size(), actualProductDao.findProducts().size());
     }
 
     @Test
@@ -37,6 +37,6 @@ public class ArrayListProductDaoTest {
         Product product = new Product();
         product.setStock(0);
         actualProductDao.save(product);
-        Assert.assertEquals(productDao.findProducts().size(), productDao.findProducts().size());
+        Assert.assertEquals(productDao.findProducts().size(), actualProductDao.findProducts().size());
     }
 }

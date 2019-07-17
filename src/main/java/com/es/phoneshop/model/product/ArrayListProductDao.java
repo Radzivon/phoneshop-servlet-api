@@ -14,7 +14,7 @@ public class ArrayListProductDao implements ProductDao {
     }
 
     private List fillProductList() {
-        List result = new ArrayList();
+        List<Product> result = new ArrayList();
         Currency usd = Currency.getInstance("USD");
         result.add(new Product(1L, "sgs", "Samsung Galaxy S", new BigDecimal(100), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg"));
         result.add(new Product(2L, "sgs2", "Samsung Galaxy S II", new BigDecimal(200), usd, 0, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S%20II.jpg"));
@@ -34,17 +34,14 @@ public class ArrayListProductDao implements ProductDao {
 
     @Override
     public synchronized Product getProduct(Long id) {
-        throw new RuntimeException("Not implemented");
+        return productList.stream().filter(product -> product.getId().equals(id)).findFirst().get();
     }
 
     @Override
     public synchronized List<Product> findProducts() {
-        List result = productList.stream().filter(product -> (product.getPrice() != null && product.getStock() > 0)).collect(Collectors.toList());
-        if (result.size() != 0) {
-            return result;
-        } else {
-            throw new NullPointerException("Not found products");
-        }
+        return productList.stream().
+                filter(product -> (product.getPrice() != null && product.getStock() > 0)).
+                collect(Collectors.toList());
     }
 
     @Override
@@ -54,6 +51,6 @@ public class ArrayListProductDao implements ProductDao {
 
     @Override
     public synchronized void delete(Long id) {
-        throw new RuntimeException("Not implemented");
+        productList.removeIf(product -> product.getId().equals(id));
     }
 }
