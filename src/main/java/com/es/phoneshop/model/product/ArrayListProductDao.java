@@ -34,11 +34,14 @@ public class ArrayListProductDao implements ProductDao {
 
     @Override
     public synchronized Product getProduct(Long id) {
-        return productList.stream().filter(product -> product.getId().equals(id)).findFirst().get();
+        return productList.stream().filter(product -> product.getId()
+                .equals(id))
+                .findFirst()
+                .orElseThrow(() -> new ProductNotFoundException("Product with " + id + " isn't"));
     }
 
     @Override
-    public synchronized List<Product> findProducts() {
+    public List<Product> findProducts() {
         return productList.stream().
                 filter(product -> (product.getPrice() != null && product.getStock() > 0)).
                 collect(Collectors.toList());
@@ -46,6 +49,9 @@ public class ArrayListProductDao implements ProductDao {
 
     @Override
     public synchronized void save(Product product) {
+        if (product == null) {
+            throw new ProductNotFoundException("Product is null");
+        }
         productList.add(product);
     }
 
