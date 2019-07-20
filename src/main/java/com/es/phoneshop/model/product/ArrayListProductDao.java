@@ -7,13 +7,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ArrayListProductDao implements ProductDao {
+    private static ArrayListProductDao instance;
+
     private List<Product> productList;
 
-    public ArrayListProductDao() {
+    private ArrayListProductDao() {
         productList = fillProductList();
     }
 
-    private List fillProductList() {
+    synchronized public static ArrayListProductDao getInstance() {
+        if (instance == null) {
+            instance = new ArrayListProductDao();
+        }
+        return instance;
+    }
+
+    private synchronized List<Product> fillProductList() {
         List<Product> result = new ArrayList();
         Currency usd = Currency.getInstance("USD");
         result.add(new Product(1L, "sgs", "Samsung Galaxy S", new BigDecimal(100), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg"));
@@ -33,7 +42,7 @@ public class ArrayListProductDao implements ProductDao {
     }
 
     @Override
-    public synchronized Product getProduct(Long id) {
+    public Product getProduct(Long id) {
         return productList.stream().filter(product -> product.getId()
                 .equals(id))
                 .findFirst()
@@ -41,7 +50,7 @@ public class ArrayListProductDao implements ProductDao {
     }
 
     @Override
-    public List<Product> findProducts() {
+    public synchronized List<Product> findProducts() {
         return productList.stream().
                 filter(product -> (product.getPrice() != null && product.getStock() > 0)).
                 collect(Collectors.toList());
@@ -50,7 +59,7 @@ public class ArrayListProductDao implements ProductDao {
     @Override
     public synchronized void save(Product product) {
         if (product == null) {
-            throw new ProductNotFoundException("Product is null");
+            throw new IllegalArgumentException("Product is null");
         }
         productList.add(product);
     }

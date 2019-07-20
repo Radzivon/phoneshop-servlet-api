@@ -16,7 +16,7 @@ public class ArrayListProductDaoTest {
 
     @Before
     public void setup() {
-        productDao = new ArrayListProductDao();
+        productDao = ArrayListProductDao.getInstance();
         usd = Currency.getInstance("USD");
         product = new Product(14L, "simsxg75",
                 "Siemens SXG75", new BigDecimal(150), usd, 40,
@@ -30,7 +30,7 @@ public class ArrayListProductDaoTest {
 
     @Test
     public void testFindProductsNegativePrice() {
-        ProductDao actualProductDao = new ArrayListProductDao();
+        ProductDao actualProductDao = ArrayListProductDao.getInstance();
         product.setPrice(null);
         actualProductDao.save(product);
         Assert.assertEquals(productDao.findProducts().size(), actualProductDao.findProducts().size());
@@ -39,7 +39,7 @@ public class ArrayListProductDaoTest {
 
     @Test
     public void testFindProductZeroStock() {
-        ProductDao actualProductDao = new ArrayListProductDao();
+        ProductDao actualProductDao = ArrayListProductDao.getInstance();
         product.setStock(0);
         actualProductDao.save(product);
         Assert.assertEquals(productDao.findProducts().size(), actualProductDao.findProducts().size());
@@ -64,7 +64,7 @@ public class ArrayListProductDaoTest {
         Assert.assertEquals(expectedSize, productDao.findProducts().size());
     }
 
-    @Test(expected = ProductNotFoundException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testSaveProductNull() {
         productDao.save(null);
     }

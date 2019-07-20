@@ -28,7 +28,7 @@ public class ProductListPageServletTest {
 
     @Before
     public void setup() {
-        when(request.getRequestDispatcher("/WEB-INF/pages/productList.jsp")).thenReturn(requestDispatcher);
+        when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
     }
 
     @Test

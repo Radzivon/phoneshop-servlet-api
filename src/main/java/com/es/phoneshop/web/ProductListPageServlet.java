@@ -15,12 +15,7 @@ import java.util.Currency;
 import java.util.List;
 
 public class ProductListPageServlet extends HttpServlet {
-    private ProductDao productDao;
-
-    @Override
-    public void init() throws ServletException {
-        productDao = new ArrayListProductDao();
-    }
+    private ProductDao productDao = ArrayListProductDao.getInstance();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
