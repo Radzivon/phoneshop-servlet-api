@@ -18,14 +18,15 @@ public class ArrayListProductDao implements ProductDao {
         }
         return instance;
     }
-
+  
     @Override
-    public synchronized Product getProduct(Long id) {
+    public Product getProduct(Long id) {
         return productList.stream().filter(product -> product.getId()
                 .equals(id))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Product with " + id + " isn't"));
     }
+
 
     public List<Product> findProducts(String query, String sort, String order) {
         if (query != null) {
@@ -75,6 +76,7 @@ public class ArrayListProductDao implements ProductDao {
         return result.stream()
                 .distinct()
                 .collect(Collectors.toList());
+
     }
 
     @Override

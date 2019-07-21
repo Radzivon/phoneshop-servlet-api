@@ -32,6 +32,7 @@ public class ArrayListProductDaoTest {
 
     @Test
     public void testFindProductsNullPrice() {
+
         ProductDao actualProductDao = ArrayListProductDao.getInstance();
         product.setPrice(null);
         actualProductDao.save(product);
