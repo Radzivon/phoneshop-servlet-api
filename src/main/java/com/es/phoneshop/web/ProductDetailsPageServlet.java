@@ -9,17 +9,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class ProductListPageServlet extends HttpServlet {
+public class ProductDetailsPageServlet extends HttpServlet {
     private ProductDao productDao = ArrayListProductDao.getInstance();
-
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String query = request.getParameter("query");
-        String sort = request.getParameter("sort");
-        String order = request.getParameter("order");
-        request.setAttribute("products", productDao.findProducts(query, sort, order));
-        request.getRequestDispatcher("/WEB-INF/pages/productList.jsp").forward(request, response);
+        request.setAttribute("product", productDao.getProduct(parseProductId(request)));
+        request.getRequestDispatcher("/WEB-INF/pages/product.jsp").forward(request, response);
+    }
 
+    private Long parseProductId(HttpServletRequest request) {
+        return Long.valueOf(request.getPathInfo().substring(1));
     }
 }
