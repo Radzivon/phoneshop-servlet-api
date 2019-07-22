@@ -27,12 +27,12 @@ public class ArrayListProductDao implements ProductDao {
                 .orElseThrow(() -> new IllegalArgumentException("Product with " + id + " isn't"));
     }
 
-    public List<Product> findProducts(String query, String sort, String order) {
+    public List<Product> findProducts(String query, String sortBy, String order) {
         if (query != null) {
-            if (sort != null && order != null) {
+            if (sortBy != null && order != null) {
                 return search(query).stream()
                         .filter(product -> (product.getPrice() != null && product.getStock() > 0))
-                        .sorted(getComparator(sort, order))
+                        .sorted(getComparator(sortBy, order))
                         .collect(Collectors.toList());
             } else {
                 return search(query).stream()
