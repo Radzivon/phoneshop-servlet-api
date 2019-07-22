@@ -58,13 +58,15 @@ public class Product {
         this.description = description;
     }
 
-    public List<ProductPrice> getPrice() {
+    public List<ProductPrice> getPrices() {
         return prices;
     }
 
-    public BigDecimal getActualPrice() { return prices.get(1).getPrice(); }
+    public BigDecimal getPrice() { return prices.get(0).getPrice(); }
 
-    public void setPrice(List<ProductPrice> prices) {
+    public void setPrice(ProductPrice price) { prices.add(price); }
+
+    public void setPrices(List<ProductPrice> prices) {
         this.prices = prices;
     }
 

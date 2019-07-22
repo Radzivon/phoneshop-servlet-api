@@ -22,11 +22,11 @@ public class ArrayListProductDaoTest {
         productForSaveFirst = new Product(14L, "simsxg75",
                 "FirstForTest", new ArrayList<>(), usd, 40,
                 "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Siemens/Siemens%20SXG75.jpg");
-        productForSaveFirst.getPrice().add(new ProductPrice("10 Jan 2019", new BigDecimal(150)));
+        productForSaveFirst.getPrices().add(new ProductPrice("10 Jan 2019", new BigDecimal(150)));
         productForSaveSecond = new Product(14L, "simsxg75",
                 "SecondForTest", new ArrayList<>(), usd, 40,
                 "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Siemens/Siemens%20SXG75.jpg");
-        productForSaveSecond.getPrice().add(new ProductPrice("10 Jan 2019", new BigDecimal(100)));
+        productForSaveSecond.getPrices().add(new ProductPrice("10 Jan 2019", new BigDecimal(100)));
     }
 
     @Test
@@ -69,7 +69,7 @@ public class ArrayListProductDaoTest {
     @Test
     public void testFindProductsNullPrice() {
         ProductDao actualProductDao = ArrayListProductDao.getInstance();
-        productForSaveFirst.setPrice(null);
+        productForSaveFirst.setPrice(new ProductPrice("",null));
         actualProductDao.save(productForSaveFirst);
         Assert.assertEquals(productDao.findProducts(null, null, null).size(), actualProductDao.findProducts(null, null, null).size());
         Assert.assertEquals(productDao.findProducts(null, null, null), actualProductDao.findProducts(null, null, null));

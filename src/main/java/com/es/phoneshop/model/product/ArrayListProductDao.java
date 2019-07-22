@@ -27,7 +27,7 @@ public class ArrayListProductDao implements ProductDao {
                 .orElseThrow(() -> new IllegalArgumentException("Product with " + id + " isn't"));
     }
 
-    public List<Product> findProducts(String query, String sortBy, String order) {
+    public synchronized List<Product> findProducts(String query, String sortBy, String order) {
         if (query != null) {
             if (sortBy != null && order != null) {
                 return search(query).stream()
@@ -52,7 +52,7 @@ public class ArrayListProductDao implements ProductDao {
             comparator = Comparator.comparing(Product::getDescription);
         } else {
             if ("price".equals(sortBy)) {
-                comparator = Comparator.comparing(Product::getActualPrice);
+                comparator = Comparator.comparing(Product::getPrice);
             } else {
                 comparator = Comparator.comparing(Product::getId);
             }
