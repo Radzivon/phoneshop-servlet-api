@@ -19,7 +19,7 @@ public class ProductPriceHistoryServlet extends HttpServlet {
     }
 
     private Long parseProductId(HttpServletRequest request) {
-        String[] id = request.getPathInfo().split("/");
-        return Long.valueOf(id[1]);
+        String id = request.getPathInfo().substring(1);
+        return Long.valueOf(id);
     }
 }

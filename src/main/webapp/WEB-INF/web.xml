@@ -29,7 +29,7 @@
 
     <servlet-mapping>
         <servlet-name>product</servlet-name>
-        <url-pattern>/products/description/*</url-pattern>
+        <url-pattern>/products/*</url-pattern>
     </servlet-mapping>
 
     <servlet>

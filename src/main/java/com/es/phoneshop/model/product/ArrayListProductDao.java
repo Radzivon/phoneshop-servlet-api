@@ -28,12 +28,12 @@ public class ArrayListProductDao implements ProductDao {
     }
 
 
-    public List<Product> findProducts(String query, String sort, String order) {
+    public synchronized List<Product> findProducts(String query, String sortBy, String order) {
         if (query != null) {
-            if (sort != null && order != null) {
+            if (sortBy != null && order != null) {
                 return search(query).stream()
                         .filter(product -> (product.getPrice() != null && product.getStock() > 0))
-                        .sorted(getComparator(sort, order))
+                        .sorted(getComparator(sortBy, order))
                         .collect(Collectors.toList());
             } else {
                 return search(query).stream()
@@ -53,7 +53,7 @@ public class ArrayListProductDao implements ProductDao {
             comparator = Comparator.comparing(Product::getDescription);
         } else {
             if ("price".equals(sortBy)) {
-                comparator = Comparator.comparing(Product::getActualPrice);
+                comparator = Comparator.comparing(Product::getPrice);
             } else {
                 comparator = Comparator.comparing(Product::getId);
             }

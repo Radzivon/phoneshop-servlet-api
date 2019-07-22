@@ -8,6 +8,6 @@
          src="https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/${product.imageUrl}">
     <br>
     <p>${product.description}</p><br>
-    <fmt:formatNumber value="${product.price.get(0).price}" type="currency"
+    <fmt:formatNumber value="${product.price}" type="currency"
                       currencySymbol="${product.currency.symbol}"/>
 </tags:master>

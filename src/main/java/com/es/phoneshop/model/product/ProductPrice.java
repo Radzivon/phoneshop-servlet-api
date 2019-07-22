@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 public class ProductPrice {
-    String date;
-    BigDecimal price;
+    private String date;
+    private BigDecimal price;
 
     public ProductPrice(String date, BigDecimal price) {
         this.date = date;
@@ -33,11 +33,11 @@ public class ProductPrice {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ProductPrice that = (ProductPrice) o;
-        return Objects.equals(price, that.price);
+        return Objects.equals(price, that.price) && Objects.equals(date, that.date);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(price);
+        return Objects.hash(price, date);
     }
 }
