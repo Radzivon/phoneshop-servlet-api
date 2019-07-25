@@ -28,7 +28,7 @@ public class ProductDemodataServletContextListener implements ServletContextList
 
     }
 
-    private synchronized List<Product> fillProductList() {
+   synchronized List<Product> fillProductList() {
         List<Product> result = new ArrayList();
         Currency usd = Currency.getInstance("USD");
         Product product = new Product(1L, "sgs", "Samsung Galaxy S", new ArrayList<>(), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");

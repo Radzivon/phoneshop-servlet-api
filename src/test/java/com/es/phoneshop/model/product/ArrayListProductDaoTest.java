@@ -1,9 +1,6 @@
 package com.es.phoneshop.model.product;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -19,11 +16,11 @@ public class ArrayListProductDaoTest {
     public void setup() {
         productDao = ArrayListProductDao.getInstance();
         usd = Currency.getInstance("USD");
-        productForSaveFirst = new Product(14L, "simsxg75",
+        productForSaveFirst = new Product(1L, "simsxg75",
                 "FirstForTest", new ArrayList<>(), usd, 40,
                 "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Siemens/Siemens%20SXG75.jpg");
         productForSaveFirst.getPrices().add(new ProductPrice("10 Jan 2019", new BigDecimal(150)));
-        productForSaveSecond = new Product(14L, "simsxg75",
+        productForSaveSecond = new Product(2L, "simsxg75",
                 "SecondForTest", new ArrayList<>(), usd, 40,
                 "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Siemens/Siemens%20SXG75.jpg");
         productForSaveSecond.getPrices().add(new ProductPrice("10 Jan 2019", new BigDecimal(100)));
@@ -38,42 +35,13 @@ public class ArrayListProductDaoTest {
     }
 
     @Test
-    public void testFindProductsIncorrectQuerySortByNullOrderNull() {
-        productDao.save(productForSaveSecond);
-        String incorrectQuery = "FirstForTestB";
-        int expectedSize = 0;
-        Assert.assertEquals(expectedSize, productDao.findProducts(incorrectQuery, null, null).size());
-    }
-
-    @Test
-    public void testFindProductsCorrectQuerySortByOrder() {
-        productDao.save(productForSaveSecond);
-
-        Assert.assertEquals(productForSaveSecond, productDao.findProducts("SecondForTest", "description", "asc").get(0));
-    }
-
-    @Test
-    public void testFindProductsQueryNull() {
-        productDao.save(productForSaveSecond);
-
-        Assert.assertEquals(productForSaveSecond, productDao.findProducts(null, null, null).get(0));
-    }
-
-    @Test
-    public void testFindProductsCorrectQueryNotNullSortAndByOrderNull() {
-        productDao.save(productForSaveSecond);
-
-        Assert.assertEquals(productForSaveSecond, productDao.findProducts("SecondForTest", null, null).get(0));
-    }
-
-    @Test
     public void testFindProductsNullPrice() {
 
         ProductDao actualProductDao = ArrayListProductDao.getInstance();
         productForSaveFirst.setPrice(new ProductPrice("",null));
         actualProductDao.save(productForSaveFirst);
-        Assert.assertEquals(productDao.findProducts(null, null, null).size(), actualProductDao.findProducts(null, null, null).size());
-        Assert.assertEquals(productDao.findProducts(null, null, null), actualProductDao.findProducts(null, null, null));
+        Assert.assertEquals(productDao.findProducts().size(), actualProductDao.findProducts().size());
+        Assert.assertEquals(productDao.findProducts(), actualProductDao.findProducts());
     }
 
     @Test
@@ -81,18 +49,18 @@ public class ArrayListProductDaoTest {
         ProductDao actualProductDao = ArrayListProductDao.getInstance();
         productForSaveFirst.setStock(0);
         actualProductDao.save(productForSaveFirst);
-        Assert.assertEquals(productDao.findProducts(null, null, null).size(), actualProductDao.findProducts(null, null, null).size());
-        Assert.assertEquals(productDao.findProducts(null, null, null), actualProductDao.findProducts(null, null, null));
+        Assert.assertEquals(productDao.findProducts().size(), actualProductDao.findProducts().size());
+        Assert.assertEquals(productDao.findProducts(), actualProductDao.findProducts());
     }
 
     @Test
     public void testGetProducts() {
-        productForSaveFirst.setId(13L);
+        productForSaveFirst.setId(1L);
         productDao.save(productForSaveFirst);
-        Assert.assertEquals(productForSaveFirst, productDao.getProduct(13L));
+        Assert.assertEquals(productForSaveFirst, productDao.getProduct(1L));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ProductNotFoundException.class)
     public void testGetProductsNegativeIndex() {
         productDao.getProduct(-1L);
     }
@@ -101,7 +69,7 @@ public class ArrayListProductDaoTest {
     public void testSave() {
         int expectedSize = 1;
         productDao.save(productForSaveFirst);
-        Assert.assertEquals(expectedSize, productDao.findProducts("FirstForTest", null, null).size());
+        Assert.assertEquals(expectedSize, productDao.findProducts().size());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -116,6 +84,6 @@ public class ArrayListProductDaoTest {
         productDao.save(productForSaveFirst);
         int expectedSize = 0;
         productDao.delete(999L);
-        Assert.assertEquals(expectedSize, productDao.findProducts("TestDelete", null, null).size());
+        Assert.assertEquals(expectedSize, productDao.findProducts().size());
     }
 }

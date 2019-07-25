@@ -42,7 +42,6 @@
         <url-pattern>/products/prices/*</url-pattern>
     </servlet-mapping>
     <error-page>
-        <location id="java.lang.IllegalArgumentException">/ProductNotFound.jsp</location>
+        <location id="com.es.phoneshop.model.product.ProductNotFoundException">/WEB-INF/pages/ProductNotFound.jsp</location>
     </error-page>
-
 </web-app>

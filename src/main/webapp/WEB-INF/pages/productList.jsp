@@ -34,9 +34,11 @@
                     <a href="${pageContext.servletContext.contextPath}/products/${product.id}">${product.description}</a>
                 </td>
                 <td class="price">
-                    <a href="${pageContext.servletContext.contextPath}/products/prices/${product.id}">
-                        <fmt:formatNumber value="${product.price.get(0).price}" type="currency"
-                                          currencySymbol="${product.currency.symbol}"/></a>
+                    <a href="<c:url value="/products/prices/${product.id}"/>">
+                        <c:set var="price" value="${product.price}" scope="request"/>
+                        <c:set var="currency" value="${product.currency}" scope="request"/>
+                        <tags:price></tags:price>
+                    </a>
                 </td>
             </tr>
         </c:forEach>

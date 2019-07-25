@@ -17,14 +17,15 @@
             </td>
         </tr>
         </thead>
-        <c:forEach var="productprice" items="${product.price}">
+        <c:forEach var="productprice" items="${product.prices}">
             <tr>
                 <td>
                         ${productprice.date}
                 </td>
                 <td class="price">
-                    <fmt:formatNumber value="${productprice.price}" type="currency"
-                                      currencySymbol="${product.currency.symbol}"/>
+                                            <c:set var="price" value="${productprice.price}" scope="request"/>
+                                            <c:set var="currency" value="${product.currency}" scope="request"/>
+                                            <tags:price></tags:price>
                 </td>
             </tr>
         </c:forEach>
