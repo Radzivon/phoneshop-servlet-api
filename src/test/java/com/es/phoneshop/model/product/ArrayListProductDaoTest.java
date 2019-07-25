@@ -20,10 +20,12 @@ public class ArrayListProductDaoTest {
                 "FirstForTest", new ArrayList<>(), usd, 40,
                 "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Siemens/Siemens%20SXG75.jpg");
         productForSaveFirst.getPrices().add(new ProductPrice("10 Jan 2019", new BigDecimal(150)));
-        productForSaveSecond = new Product(2L, "simsxg75",
-                "SecondForTest", new ArrayList<>(), usd, 40,
-                "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Siemens/Siemens%20SXG75.jpg");
-        productForSaveSecond.getPrices().add(new ProductPrice("10 Jan 2019", new BigDecimal(100)));
+    }
+
+    @After
+    public void clean() {
+        final Long ID = 1L;
+        productDao.delete(ID);
     }
 
     @Test
@@ -38,7 +40,7 @@ public class ArrayListProductDaoTest {
     public void testFindProductsNullPrice() {
 
         ProductDao actualProductDao = ArrayListProductDao.getInstance();
-        productForSaveFirst.setPrice(new ProductPrice("",null));
+        productForSaveFirst.setPrice(new ProductPrice("", null));
         actualProductDao.save(productForSaveFirst);
         Assert.assertEquals(productDao.findProducts().size(), actualProductDao.findProducts().size());
         Assert.assertEquals(productDao.findProducts(), actualProductDao.findProducts());
@@ -55,7 +57,6 @@ public class ArrayListProductDaoTest {
 
     @Test
     public void testGetProducts() {
-        productForSaveFirst.setId(1L);
         productDao.save(productForSaveFirst);
         Assert.assertEquals(productForSaveFirst, productDao.getProduct(1L));
     }
@@ -79,11 +80,10 @@ public class ArrayListProductDaoTest {
 
     @Test
     public void testDelete() {
-        productForSaveFirst.setDescription("TestDelete");
-        productForSaveFirst.setId(999L);
+        final Long id = 1L;
         productDao.save(productForSaveFirst);
         int expectedSize = 0;
-        productDao.delete(999L);
+        productDao.delete(id);
         Assert.assertEquals(expectedSize, productDao.findProducts().size());
     }
 }

@@ -3,6 +3,7 @@ package com.es.phoneshop.web;
 import com.es.phoneshop.model.product.ArrayListProductDao;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.ProductDao;
+import com.es.phoneshop.model.product.ProductNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,7 +47,7 @@ public class ProductDetailsPageServletTest {
         verify(request).getRequestDispatcher("/WEB-INF/pages/product.jsp");
         verify(requestDispatcher).forward(request, response);
     }
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ProductNotFoundException.class)
     public void testDoGetNoResult() throws ServletException, IOException {
         when(request.getPathInfo()).thenReturn("/999");
         servlet.doGet(request, response);
