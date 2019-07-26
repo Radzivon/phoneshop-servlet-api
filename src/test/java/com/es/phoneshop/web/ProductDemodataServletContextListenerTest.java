@@ -7,7 +7,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -19,28 +18,39 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProductDemodataServletContextListenerTest {
+
     @Mock
     private ServletContextEvent servletContextEvent;
     @Mock
-    Product product;
-    @InjectMocks
-    private ProductDemodataServletContextListener productDemodataServletContextListener;
+    ServletContext servletContext;
     @Mock
-    private ProductDao productDao;
+    private Product product;
+    @Spy
+    private ProductDao productDao = ArrayListProductDao.getInstance();
+
+    private ProductDemodataServletContextListener productDemodataServletContextListener = new ProductDemodataServletContextListener();
+
+    @Before
+    public void setup() {
+        when(servletContextEvent.getServletContext()).thenReturn(servletContext);
+    }
 
     @Ignore
     @Test
     public void testFillProductList() {
         when(servletContextEvent.getServletContext().getInitParameter("productDemodata")).thenReturn("true");
         productDemodataServletContextListener.contextInitialized(servletContextEvent);
-        verify(productDao).save(product);
+
+        for (Product product : productDemodataServletContextListener.fillProductList()) {
+            verify(productDao).save(product);
+        }
     }
 
-    @Ignore
     @Test
     public void testFillProductListNoResult() {
         when(servletContextEvent.getServletContext().getInitParameter("productDemodata")).thenReturn("false");
         productDemodataServletContextListener.contextInitialized(servletContextEvent);
+
         verify(productDao, never()).save(product);
     }
 }

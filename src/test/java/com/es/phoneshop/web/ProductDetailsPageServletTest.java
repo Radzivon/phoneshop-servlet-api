@@ -43,17 +43,11 @@ public class ProductDetailsPageServletTest {
     public void testDoGetBadPath() throws ServletException, IOException {
         when(request.getPathInfo()).thenReturn("null");
         servlet.doGet(request, response);
-
-        verify(request).getRequestDispatcher("/WEB-INF/pages/product.jsp");
-        verify(requestDispatcher).forward(request, response);
     }
     @Test(expected = ProductNotFoundException.class)
     public void testDoGetNoResult() throws ServletException, IOException {
         when(request.getPathInfo()).thenReturn("/999");
         servlet.doGet(request, response);
-
-        verify(request).getRequestDispatcher("/WEB-INF/pages/product.jsp");
-        verify(requestDispatcher).forward(request, response);
     }
     @Test
     public void testDoGet() throws ServletException, IOException {
