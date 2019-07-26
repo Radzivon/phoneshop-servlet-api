@@ -1,38 +1,50 @@
 package com.es.phoneshop.model.product;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Currency;
-
-import static org.junit.Assert.assertFalse;
 
 public class ArrayListProductDaoTest {
     private ProductDao productDao;
     private Currency usd;
-    private Product product;
+    private Product productForSaveFirst;
+    private Product productForSaveSecond;
 
     @Before
     public void setup() {
         productDao = ArrayListProductDao.getInstance();
         usd = Currency.getInstance("USD");
-        product = new Product(14L, "simsxg75",
-                "Siemens SXG75", new BigDecimal(150), usd, 40,
+        productForSaveFirst = new Product(1L, "simsxg75",
+                "FirstForTest", new ArrayList<>(), usd, 40,
                 "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Siemens/Siemens%20SXG75.jpg");
+        productForSaveFirst.getPrices().add(new ProductPrice("10 Jan 2019", new BigDecimal(150)));
+    }
+
+    @After
+    public void clean() {
+        final Long ID = 1L;
+        productDao.delete(ID);
     }
 
     @Test
-    public void testFindProductsNoResults() {
-        assertFalse(productDao.findProducts().isEmpty());
+    public void testGetInstance() {
+        ProductDao productDaoTest = ArrayListProductDao.getInstance();
+
+        Assert.assertTrue(productDao == productDaoTest);
+        Assert.assertEquals(productDao, productDaoTest);
     }
 
     @Test
-    public void testFindProductsNegativePrice() {
+    public void testFindProductsNullPrice() {
+
         ProductDao actualProductDao = ArrayListProductDao.getInstance();
-        product.setPrice(null);
-        actualProductDao.save(product);
+        productForSaveFirst.setPrice(new ProductPrice("", null));
+        actualProductDao.save(productForSaveFirst);
         Assert.assertEquals(productDao.findProducts().size(), actualProductDao.findProducts().size());
         Assert.assertEquals(productDao.findProducts(), actualProductDao.findProducts());
     }
@@ -40,16 +52,16 @@ public class ArrayListProductDaoTest {
     @Test
     public void testFindProductZeroStock() {
         ProductDao actualProductDao = ArrayListProductDao.getInstance();
-        product.setStock(0);
-        actualProductDao.save(product);
+        productForSaveFirst.setStock(0);
+        actualProductDao.save(productForSaveFirst);
         Assert.assertEquals(productDao.findProducts().size(), actualProductDao.findProducts().size());
         Assert.assertEquals(productDao.findProducts(), actualProductDao.findProducts());
     }
 
     @Test
     public void testGetProducts() {
-        product.setId(13L);
-        Assert.assertEquals(product, productDao.getProduct(13L));
+        productDao.save(productForSaveFirst);
+        Assert.assertEquals(productForSaveFirst, productDao.getProduct(1L));
     }
 
     @Test(expected = ProductNotFoundException.class)
@@ -59,8 +71,8 @@ public class ArrayListProductDaoTest {
 
     @Test
     public void testSave() {
-        int expectedSize = productDao.findProducts().size() + 1;
-        productDao.save(product);
+        int expectedSize = 1;
+        productDao.save(productForSaveFirst);
         Assert.assertEquals(expectedSize, productDao.findProducts().size());
     }
 
@@ -71,8 +83,10 @@ public class ArrayListProductDaoTest {
 
     @Test
     public void testDelete() {
-        int expectedSize = productDao.findProducts().size() - 1;
-        productDao.delete(1L);
+        final Long id = 1L;
+        productDao.save(productForSaveFirst);
+        int expectedSize = 0;
+        productDao.delete(id);
         Assert.assertEquals(expectedSize, productDao.findProducts().size());
     }
 }

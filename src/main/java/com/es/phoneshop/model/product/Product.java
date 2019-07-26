@@ -2,6 +2,7 @@ package com.es.phoneshop.model.product;
 
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.List;
 import java.util.Objects;
 
 public class Product {
@@ -11,7 +12,7 @@ public class Product {
     /**
      * null means there is no price because the product is outdated or new
      */
-    private BigDecimal price;
+    private List<ProductPrice> prices;
     /**
      * can be null if the price is null
      */
@@ -22,11 +23,11 @@ public class Product {
     public Product() {
     }
 
-    public Product(Long id, String code, String description, BigDecimal price, Currency currency, int stock, String imageUrl) {
+    public Product(Long id, String code, String description, List<ProductPrice> prices, Currency currency, int stock, String imageUrl) {
         this.id = id;
         this.code = code;
         this.description = description;
-        this.price = price;
+        this.prices = prices;
         this.currency = currency;
         this.stock = stock;
         this.imageUrl = imageUrl;
@@ -56,12 +57,16 @@ public class Product {
         this.description = description;
     }
 
-    public BigDecimal getPrice() {
-        return price;
+    public List<ProductPrice> getPrices() {
+        return prices;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
+    public BigDecimal getPrice() { return prices.get(0).getPrice(); }
+
+    public void setPrice(ProductPrice price) { prices.add(price); }
+
+    public void setPrices(List<ProductPrice> prices) {
+        this.prices = prices;
     }
 
     public Currency getCurrency() {
@@ -99,5 +104,13 @@ public class Product {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", description='" + description + '\'' +
+                '}';
     }
 }
