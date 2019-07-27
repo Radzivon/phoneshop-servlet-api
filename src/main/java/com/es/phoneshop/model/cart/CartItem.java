@@ -2,10 +2,10 @@ package com.es.phoneshop.model.cart;
 
 public class CartItem {
     private Long productId;
-    private Long quantity;
+    private int quantity;
 
-    public CartItem(Long productId, Long quantity) {
-        if(productId == null){
+    public CartItem(Long productId, int quantity) {
+        if (productId == null) {
             throw new IllegalArgumentException();
         }
         this.productId = productId;
@@ -20,11 +20,17 @@ public class CartItem {
         this.productId = productId;
     }
 
-    public Long getQuantity() {
+    public int getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Long quantity) {
+    public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    @Override
+    public String toString() {
+        return "Product: " +
+                productId + " + quantity" + quantity;
     }
 }
