@@ -29,6 +29,9 @@ public class ProductDetailsPageServlet extends HttpServlet {
     private static final String JSP_PATH = "/WEB-INF/pages/product.jsp";
     private static final String CART = "cart";
     private static final String RECENTLY_VIEWED_PRODUCTS_SESSION_ATTRIBUTE = "recentlyviewed";
+    private static final String URL_MESSAGE = "?message=Added to cart successfully";
+    private static final String NUMBER_FORMAT_EXCEPTION_MESSAGE = "Not a number";
+    private static final String OUT_OF_STOCK_EXCEPTION_MESSAGE = "Out of stock. Max stock is ";
 
     @Override
     public void init() throws ServletException {
@@ -45,6 +48,7 @@ public class ProductDetailsPageServlet extends HttpServlet {
 
         Product product = productDao.getProduct(parseProductId(request));
         recentlyViewedProductsService.add(recentlyViewedProducts, product);
+
         request.setAttribute(CART, cart);
         request.setAttribute(PRODUCT, product);
         request.setAttribute(RECENTLY_VIEWED_PRODUCTS_SESSION_ATTRIBUTE, recentlyViewedProducts);
@@ -55,7 +59,6 @@ public class ProductDetailsPageServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Cart cart = cartService.getCart(request);
 
-
         try {
             Locale locale = request.getLocale();
             int quantity = Integer.valueOf(NumberFormat.getInstance(locale).parse(request.getParameter(QUANTITY)).intValue());
@@ -65,12 +68,12 @@ public class ProductDetailsPageServlet extends HttpServlet {
             cartService.add(cart, product, quantity);
 
             response.sendRedirect(request.getRequestURI() +
-                    "?message=Added to cart successfully");
+                    URL_MESSAGE);
             return;
         } catch (NumberFormatException | ParseException exception) {
-            request.setAttribute("error", "Not a number");
+            request.setAttribute("error", NUMBER_FORMAT_EXCEPTION_MESSAGE);
         } catch (OutOfStockException e) {
-            request.setAttribute("error", "Out of stock. Max stock is " + e.getMaxStock());
+            request.setAttribute("error", OUT_OF_STOCK_EXCEPTION_MESSAGE + e.getMaxStock());
         }
 
         doGet(request, response);

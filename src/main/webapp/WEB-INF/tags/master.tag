@@ -1,6 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ tag trimDirectiveWhitespaces="true" %>
 <%@ attribute name="pageTitle" required="true" %>
+<%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 
 <html>
 <head>
@@ -22,22 +23,25 @@
     <p class="text">Recently viewed</p>
     <div class="row">
         <c:forEach var="product" items="${recentlyviewed}">
-        <div class="card">
-            <div class="card-img-top">
-                <img class="product-tile"
-                     src="https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/${product.imageUrl}">
+            <div class="col-1">
+                <div class="card">
+                    <div class="card-img-top">
+                        <img class="product-tile"
+                             src="https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/${product.imageUrl}">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-link">
+                            <a href="<c:url value="/products/${product.id}"/>">${product.description}</a>
+                        </div>
+                        <div class="card-text">
+                            <c:set var="price" value="${product.price}" scope="request"/>
+                            <c:set var="currency" value="${product.currency}" scope="request"/>
+                            <tags:price></tags:price>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="card-link">
-                <a href="<c:url value="/products/${product.id}"/>">${product.description}</a>
-            </div>
-            <div class="card-text">
-                <div class="price"
-                <c:set var="price" value="${product.price}" scope="request"/>
-                <c:set var="currency" value="${product.currency}" scope="request"/>
-                <tags:price></tags:price></div>
-        </div>
-    </div>
-    </c:forEach>
+        </c:forEach>
     </div>
 </main>
 (c) Expert Soft

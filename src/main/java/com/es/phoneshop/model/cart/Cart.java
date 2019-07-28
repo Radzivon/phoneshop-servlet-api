@@ -7,9 +7,14 @@ import java.util.List;
 import java.util.Locale;
 
 public class Cart {
-    private List<CartItem> cartItems = new ArrayList<>();
+    private List<CartItem> cartItems;
     private BigDecimal totalCost;
     private int totalQuantity;
+
+    public Cart() {
+        cartItems = new ArrayList<>();
+        totalCost = new BigDecimal(0);
+    }
 
     public List<CartItem> getCartItems() {
         return cartItems;

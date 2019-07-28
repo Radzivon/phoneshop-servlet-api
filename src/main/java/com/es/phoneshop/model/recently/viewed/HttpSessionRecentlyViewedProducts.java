@@ -32,6 +32,7 @@ public class HttpSessionRecentlyViewedProducts implements RecentlyViewedProducts
 
     @Override
     public void add(LinkedList<Product> recentlyViewedProducts, Product product) {
+        recentlyViewedProducts.remove(product);
         if (recentlyViewedProducts.size() == MAX_QUANTITY_PRODUCTS) {
             recentlyViewedProducts.removeLast();
         }
