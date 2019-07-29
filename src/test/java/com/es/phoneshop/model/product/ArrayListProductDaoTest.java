@@ -13,7 +13,6 @@ public class ArrayListProductDaoTest {
     private ProductDao productDao;
     private Currency usd;
     private Product productForSaveFirst;
-    private Product productForSaveSecond;
 
     @Before
     public void setup() {
@@ -37,7 +36,7 @@ public class ArrayListProductDaoTest {
 
         Assert.assertTrue(productDao == productDaoTest);
         Assert.assertEquals(productDao, productDaoTest);
-    }
+}
 
     @Test
     public void testFindProductsNullPrice() {

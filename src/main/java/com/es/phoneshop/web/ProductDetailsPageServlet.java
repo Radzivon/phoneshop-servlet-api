@@ -67,8 +67,7 @@ public class ProductDetailsPageServlet extends HttpServlet {
 
             cartService.add(cart, product, quantity);
 
-            response.sendRedirect(request.getRequestURI() +
-                    URL_MESSAGE);
+            response.sendRedirect(request.getRequestURI() + URL_MESSAGE);
             return;
         } catch (NumberFormatException | ParseException exception) {
             request.setAttribute("error", NUMBER_FORMAT_EXCEPTION_MESSAGE);
@@ -79,7 +78,8 @@ public class ProductDetailsPageServlet extends HttpServlet {
         doGet(request, response);
     }
 
-    private Long parseProductId(HttpServletRequest request) {
-        return Long.valueOf(request.getPathInfo().substring(1));
+     Long parseProductId(HttpServletRequest request) {
+        return Long.valueOf(request.getPathInfo()
+                .substring(1));
     }
 }

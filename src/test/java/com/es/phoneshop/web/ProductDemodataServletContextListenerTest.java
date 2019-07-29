@@ -7,12 +7,17 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 
@@ -25,10 +30,12 @@ public class ProductDemodataServletContextListenerTest {
     ServletContext servletContext;
     @Mock
     private Product product;
-    @Spy
-    private ProductDao productDao = ArrayListProductDao.getInstance();
-
-    private ProductDemodataServletContextListener productDemodataServletContextListener = new ProductDemodataServletContextListener();
+    @Mock
+    private ProductDao productDao;
+    @Mock
+    List<Product> list;
+    @InjectMocks
+    private ProductDemodataServletContextListener productDemodataServletContextListener;
 
     @Before
     public void setup() {
@@ -39,8 +46,7 @@ public class ProductDemodataServletContextListenerTest {
     @Test
     public void testFillProductList() {
         when(servletContextEvent.getServletContext().getInitParameter("productDemodata")).thenReturn("true");
-        productDemodataServletContextListener.contextInitialized(servletContextEvent);
-
+        // productDemodataServletContextListener.contextInitialized(servletContextEvent);
         for (Product product : productDemodataServletContextListener.fillProductList()) {
             verify(productDao).save(product);
         }

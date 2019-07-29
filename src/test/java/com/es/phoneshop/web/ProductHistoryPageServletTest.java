@@ -7,6 +7,7 @@ import com.es.phoneshop.model.product.ProductNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -30,7 +31,8 @@ public class ProductHistoryPageServletTest {
     private RequestDispatcher requestDispatcher;
     @Mock
     private Product product;
-    private ProductPriceHistoryServlet servlet = new ProductPriceHistoryServlet();
+    @InjectMocks
+    private ProductPriceHistoryServlet servlet;
 
     @Before
     public void setup() {

@@ -3,6 +3,7 @@ package com.es.phoneshop.web;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -24,8 +25,8 @@ public class ProductListPageServletTest {
     private HttpServletResponse response;
     @Mock
     private RequestDispatcher requestDispatcher;
-
-    private ProductListPageServlet servlet = new ProductListPageServlet();
+    @InjectMocks
+    private ProductListPageServlet servlet;
 
     @Before
     public void setup() {
