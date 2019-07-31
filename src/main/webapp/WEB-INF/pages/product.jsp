@@ -10,7 +10,7 @@
             <p>${param.message}</p>
         </c:if>
         <c:if test="${not empty error}">
-        <p class="error">Error</p>
+            <p class="error">Error</p>
         </c:if>
         <p>
             <img class="product-tile"
@@ -21,7 +21,7 @@
             Current stock: ${product.stock}
         </p>
         <form method="post" action="<c:url value="/products/${product.id}"/>">
-            <input name="quantity" class="price" value="${param.quantity == null? 1 : param.quantity}">
+            <input name="quantity" type="number" min="1" value="${param.quantity == null? 1 : param.quantity}">
             <button>Add to cart</button>
             <br>
             <c:if test="${not empty error}">

@@ -1,91 +1,98 @@
 package com.es.phoneshop.model.recently.viewed;
 
-import com.es.phoneshop.model.product.ArrayListProductDao;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.ProductDao;
-import com.es.phoneshop.model.product.ProductPrice;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.servlet.http.HttpServletRequest;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Currency;
+import javax.servlet.http.HttpSession;
 import java.util.LinkedList;
 
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
+
+@RunWith(MockitoJUnitRunner.class)
 public class HttpSessionRecentlyViewedProductsTest {
-    private ProductDao productDao;
-    private RecentlyViewedProductsService recentlyViewedProductsService;
-    private LinkedList<Product> recentlyViewedProducts;
-    private Product productFirstForSave;
-    private Product productSecondForSave;
-    private Product productThirdForSave;
-    private Product productFourthForSave;
-    private Long idForFirstProduct = 1L;
-    private Long idForSecondProduct = 2L;
-    private Long idForThirdProduct = 3L;
-    private Long idForFourthProduct = 4L;
-    private Currency usd = Currency.getInstance("USD");
+    @Mock
     private HttpServletRequest request;
+    @Mock
+    private HttpSession session;
+    @Mock
+    private Product product;
+    @Mock
+    private ProductDao productDao;
+    @Mock
+    private AddToRecentlyViewedProductsResult addToRecentlyViewedProductsResult;
+    @Mock
+    private LinkedList<Product> recentlyViewedProducts;
+    @InjectMocks
+    HttpSessionRecentlyViewedProducts httpSessionRecentlyViewedProducts;
+
 
     @Before
     public void setup() {
-        recentlyViewedProductsService = HttpSessionRecentlyViewedProducts.getInstance();
-        productDao = ArrayListProductDao.getInstance();
-        recentlyViewedProducts = new LinkedList<>();
-
-        productFirstForSave = new Product(idForFirstProduct, "sgs", "Samsung Galaxy S", new ArrayList<>(), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");
-        productFirstForSave.getPrices().add(new ProductPrice("10 Jan 2019", new BigDecimal(100)));
-        productDao.save(productFirstForSave);
-
-        productSecondForSave = new Product(idForSecondProduct, "sgs2", "Samsung Galaxy S II", new ArrayList<>(), usd, 0, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S%20II.jpg");
-        productSecondForSave.getPrices().add(new ProductPrice("10 Jan 2019", new BigDecimal(200)));
-        productDao.save(productSecondForSave);
-
-        productThirdForSave = new Product(idForThirdProduct, "sgs3", "Samsung Galaxy S III", new ArrayList<>(), usd, 5, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S%20III.jpg");
-        productThirdForSave.getPrices().add(new ProductPrice("10 Jan 2019", new BigDecimal(300)));
-        productDao.save(productThirdForSave);
-
-        productFourthForSave = new Product(idForFourthProduct, "iphone", "Apple iPhone", new ArrayList<>(), usd, 10, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Apple/Apple%20iPhone.jpg");
-        productFourthForSave.getPrices().add(new ProductPrice("10 Jan 2019", new BigDecimal(200)));
-        productDao.save(productFourthForSave);
-
+        when(productDao.getProduct(anyLong())).thenReturn(product);
+        when(request.getSession()).thenReturn(session);
+        when(session.getAttribute(anyString())).thenReturn(recentlyViewedProducts);
+        when(httpSessionRecentlyViewedProducts.getRecentlyViewedProducts(request)).thenReturn(recentlyViewedProducts);
     }
 
-    @After
-    public void clean() {
-        productDao.delete(idForFirstProduct);
-        productDao.delete(idForSecondProduct);
-        productDao.delete(idForThirdProduct);
-        productDao.delete(idForFourthProduct);
+    @Test
+    public void testParseId() {
+        when(request.getPathInfo()).thenReturn("/1");
+        Long expectedId = 1L;
+        Long actualId = httpSessionRecentlyViewedProducts.parseProductId(request);
+        Assert.assertEquals(expectedId, actualId);
+    }
+
+    @Test(expected = NumberFormatException.class)
+    public void testParseIdIncorrectPath() {
+        when(request.getPathInfo()).thenReturn("null");
+        httpSessionRecentlyViewedProducts.parseProductId(request);
+    }
+
+    @Test
+    public void getRecentlyViewedProductsListNull() {
+
+        httpSessionRecentlyViewedProducts.getRecentlyViewedProducts(request);
+
+        verify(session).getAttribute("recentlyviewed");
     }
 
     @Test
     public void getInstance() {
-        RecentlyViewedProductsService recentlyViewedProducts = HttpSessionRecentlyViewedProducts.getInstance();
-
-        Assert.assertTrue(recentlyViewedProductsService == recentlyViewedProducts);
-        Assert.assertEquals(recentlyViewedProductsService, recentlyViewedProducts);
+        HttpSessionRecentlyViewedProducts temp = HttpSessionRecentlyViewedProducts.getInstance();
+        Assert.assertNotNull(temp);
     }
 
-    @Ignore
-    @Test
-    public void getRecentlyViewedProductsNotNull() {
 
+    @Test
+    public void addWithSizeThree() {
+        int listSize = 3;
+        when(recentlyViewedProducts.size()).thenReturn(listSize);
+        when(request.getPathInfo()).thenReturn("/1");
+
+        httpSessionRecentlyViewedProducts.add(request);
+
+        verify(recentlyViewedProducts).removeLast();
     }
 
     @Test
-    public void addFourProducts() {
-        LinkedList<Product> expectedListProducts = new LinkedList<>();
-        int expectedSize = 3;
-        expectedListProducts.add(productFourthForSave);
-        expectedListProducts.add(productThirdForSave);
-        expectedListProducts.add(productSecondForSave);
-        recentlyViewedProductsService.add(recentlyViewedProducts, productFirstForSave);
-        recentlyViewedProductsService.add(recentlyViewedProducts, productSecondForSave);
-        recentlyViewedProductsService.add(recentlyViewedProducts, productThirdForSave);
-        recentlyViewedProductsService.add(recentlyViewedProducts, productFourthForSave);
+    public void addFirstElement() {
+        int listSize = 0;
+        when(recentlyViewedProducts.size()).thenReturn(listSize);
+        when(request.getPathInfo()).thenReturn("/1");
 
-        Assert.assertEquals(expectedSize,recentlyViewedProducts.size());
-        Assert.assertEquals(expectedListProducts, recentlyViewedProducts);
+        httpSessionRecentlyViewedProducts.add(request);
+
+        verify(recentlyViewedProducts, never()).removeLast();
+        verify(recentlyViewedProducts).addFirst(product);
+        verify(addToRecentlyViewedProductsResult).setProducts(recentlyViewedProducts);
     }
 }

@@ -42,7 +42,7 @@ public class Cart {
 
     @Override
     public String toString() {
-        return "Cart: Quantity: " + totalQuantity + " Total: " + totalCost + Currency.getInstance(Locale.US);
+        return "Quantity: " + totalQuantity + " Total: " + totalCost + Currency.getInstance(Locale.US) + cartItems;
 
     }
 }
