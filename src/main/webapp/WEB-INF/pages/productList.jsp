@@ -12,7 +12,7 @@
         <input name="query" value="${param.query}">
         <button>Search</button>
     </form>
-    <table>
+    <table class="table-responsive">
         <thead>
         <tr>
             <td>Image</td>
@@ -31,7 +31,7 @@
                          src="https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/${product.imageUrl}">
                 </td>
                 <td>
-                    <a href="${pageContext.servletContext.contextPath}/products/${product.id}">${product.description}</a>
+                    <a href="<c:url value="/products/${product.id}"/>">${product.description}</a>
                 </td>
                 <td class="price">
                     <a href="<c:url value="/products/prices/${product.id}"/>">

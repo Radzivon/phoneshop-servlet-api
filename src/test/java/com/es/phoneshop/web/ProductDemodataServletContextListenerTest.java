@@ -13,6 +13,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
+import java.util.Collections;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 
@@ -25,10 +27,14 @@ public class ProductDemodataServletContextListenerTest {
     ServletContext servletContext;
     @Mock
     private Product product;
+    @Mock
+    private ProductDao productDao;
+    @Mock
+    ArrayListProductDao arrayListProductDao;
+    @Mock
+    List<Product> list;
     @Spy
-    private ProductDao productDao = ArrayListProductDao.getInstance();
-
-    private ProductDemodataServletContextListener productDemodataServletContextListener = new ProductDemodataServletContextListener();
+    private ProductDemodataServletContextListener productDemodataServletContextListener;
 
     @Before
     public void setup() {
@@ -39,11 +45,11 @@ public class ProductDemodataServletContextListenerTest {
     @Test
     public void testFillProductList() {
         when(servletContextEvent.getServletContext().getInitParameter("productDemodata")).thenReturn("true");
+        doReturn(Collections.singletonList(product)).when(productDemodataServletContextListener).fillProductList();
+
         productDemodataServletContextListener.contextInitialized(servletContextEvent);
 
-        for (Product product : productDemodataServletContextListener.fillProductList()) {
-            verify(productDao).save(product);
-        }
+        verify(productDao).save(product);
     }
 
     @Test

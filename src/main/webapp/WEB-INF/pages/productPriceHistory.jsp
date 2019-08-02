@@ -8,9 +8,9 @@
     <br>
     <h2>${product.description}</h2>
     <br>
-    <table>
+    <table class="table">
         <thead>
-        <tr>
+        <tr class="row">
             <td>Start date
             </td>
             <td class="price">Price
