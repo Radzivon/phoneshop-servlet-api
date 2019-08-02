@@ -13,7 +13,7 @@ public class HttpSessionRecentlyViewedProducts implements RecentlyViewedProducts
     private static final int MAX_QUANTITY_PRODUCTS = 3;
     private static HttpSessionRecentlyViewedProducts instance = new HttpSessionRecentlyViewedProducts();
     private ProductDao productDao;
-    private AddToRecentlyViewedProductsResult addToRecentlyViewedProductsResult;
+    private AddToRecentlyViewedProductsResult addToRecentlyViewedProductsResult = new AddToRecentlyViewedProductsResult();
 
     private HttpSessionRecentlyViewedProducts() {
         productDao = ArrayListProductDao.getInstance();

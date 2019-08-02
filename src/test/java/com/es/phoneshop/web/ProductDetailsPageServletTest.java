@@ -3,6 +3,7 @@ package com.es.phoneshop.web;
 import com.es.phoneshop.model.cart.*;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.ProductDao;
+import com.es.phoneshop.model.product.ProductService;
 import com.es.phoneshop.model.recently.viewed.AddToRecentlyViewedProductsResult;
 import com.es.phoneshop.model.recently.viewed.RecentlyViewedProductsService;
 import org.junit.*;
@@ -46,6 +47,8 @@ public class ProductDetailsPageServletTest {
     @Mock
     private LinkedList<Product> recentlyViewedProducts;
     @Mock
+    private ProductService productService;
+    @Mock
     private Product product;
     @Mock
     private ProductDao productDao;
@@ -56,6 +59,8 @@ public class ProductDetailsPageServletTest {
     @Before
     public void setup() throws ServletException {
         when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
+        when(request.getPathInfo()).thenReturn("/1");
+        when(productService.getProductById(anyLong())).thenReturn(product);
         when(addToCartResult.getProduct()).thenReturn(product);
         when(addToCartResult.getCart()).thenReturn(cart);
         when(addToRecentlyViewedProductsResult.getProducts()).thenReturn(recentlyViewedProducts);

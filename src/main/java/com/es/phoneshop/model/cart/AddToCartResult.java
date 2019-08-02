@@ -7,7 +7,7 @@ public class AddToCartResult {
     private static Product product;
     private static String errorMessage;
 
-    public  String getErrorMessage() {
+    public String getErrorMessage() {
         return errorMessage;
     }
 
@@ -20,7 +20,7 @@ public class AddToCartResult {
     }
 
     public void setCart(Cart cart) {
-        this.cart = cart;
+        AddToCartResult.cart = cart;
     }
 
     public Product getProduct() {
@@ -28,6 +28,6 @@ public class AddToCartResult {
     }
 
     public void setProduct(Product product) {
-        this.product = product;
+        AddToCartResult.product = product;
     }
 }

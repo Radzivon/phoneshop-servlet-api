@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 public class ProductService {
     private final String QUERY = "";
+    private ProductDao productDao = ArrayListProductDao.getInstance();
+
     public List<Product> findProducts(String query, String sortBy, String order) {
         Comparator<Product> comparator = null;
         query = query == null ? QUERY : query;
@@ -25,7 +27,7 @@ public class ProductService {
 
     private List<Product> search(String query) {
         String[] wordsForSearch = query.toLowerCase().split("\\s+");
-        return ArrayListProductDao.getInstance().findProducts().stream()
+        return productDao.findProducts().stream()
                 .collect(Collectors.toMap(product -> product, product -> Arrays.stream(wordsForSearch)
                         .filter(word -> product.getDescription().toLowerCase().contains(word)).count()))
                 .entrySet().stream()
@@ -33,5 +35,9 @@ public class ProductService {
                 .sorted((x, y) -> y.getValue().compareTo(x.getValue()))
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
+    }
+
+    public Product getProductById(Long id) {
+        return productDao.getProduct(id);
     }
 }
