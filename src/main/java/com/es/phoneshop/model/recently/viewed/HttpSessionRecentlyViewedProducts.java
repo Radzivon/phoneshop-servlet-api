@@ -43,6 +43,7 @@ public class HttpSessionRecentlyViewedProducts implements RecentlyViewedProducts
             recentlyViewedProducts.removeLast();
         }
         recentlyViewedProducts.addFirst(product);
+        addToRecentlyViewedProductsResult.setProduct(product);
         addToRecentlyViewedProductsResult.setProducts(recentlyViewedProducts);
     }
 

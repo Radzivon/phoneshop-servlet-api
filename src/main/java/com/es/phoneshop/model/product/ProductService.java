@@ -7,8 +7,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ProductService {
+    private static ProductService instance = new ProductService();
     private final String QUERY = "";
-    private ProductDao productDao = ArrayListProductDao.getInstance();
+    private static ProductDao productDao = ArrayListProductDao.getInstance();
+
+    public static ProductService getInstance() {
+        return instance;
+    }
 
     public List<Product> findProducts(String query, String sortBy, String order) {
         Comparator<Product> comparator = null;

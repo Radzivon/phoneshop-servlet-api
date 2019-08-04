@@ -10,13 +10,16 @@
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link href='http://fonts.googleapis.com/css?family=Lobster+Two' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="${pageContext.servletContext.contextPath}/styles/main.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+          integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 </head>
 <body class="product-list">
 <header>
     <a href="${pageContext.servletContext.contextPath}">
         <img src="${pageContext.servletContext.contextPath}/images/logo.svg"/>
         PhoneShop
-    </a>${cart}
+    </a>
+   <jsp:include page="/minicart"></jsp:include>
 </header>
 <main>
     <jsp:doBody/>

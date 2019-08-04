@@ -1,12 +1,15 @@
 package com.es.phoneshop.web;
 
-import com.es.phoneshop.model.cart.*;
+import com.es.phoneshop.model.cart.Cart;
+import com.es.phoneshop.model.cart.CartService;
+import com.es.phoneshop.model.cart.CartServiceMethodsResult;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.ProductDao;
 import com.es.phoneshop.model.product.ProductService;
 import com.es.phoneshop.model.recently.viewed.AddToRecentlyViewedProductsResult;
 import com.es.phoneshop.model.recently.viewed.RecentlyViewedProductsService;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -17,11 +20,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.Locale;
 
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,7 +38,7 @@ public class ProductDetailsPageServletTest {
     @Mock
     private CartService cartService;
     @Mock
-    private AddToCartResult addToCartResult;
+    private CartServiceMethodsResult cartServiceMethodsResult;
     @Mock
     private AddToRecentlyViewedProductsResult addToRecentlyViewedProductsResult;
     @Mock
@@ -59,10 +60,8 @@ public class ProductDetailsPageServletTest {
     @Before
     public void setup() throws ServletException {
         when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
-        when(request.getPathInfo()).thenReturn("/1");
-        when(productService.getProductById(anyLong())).thenReturn(product);
-        when(addToCartResult.getProduct()).thenReturn(product);
-        when(addToCartResult.getCart()).thenReturn(cart);
+        when(cartServiceMethodsResult.getProduct()).thenReturn(product);
+        when(cartServiceMethodsResult.getCart()).thenReturn(cart);
         when(addToRecentlyViewedProductsResult.getProducts()).thenReturn(recentlyViewedProducts);
     }
 
@@ -95,7 +94,7 @@ public class ProductDetailsPageServletTest {
     public void testDoPostWithParseException() throws IOException, ServletException {
         boolean isError = true;
         when(cartService.add(request)).thenReturn(isError);
-        when(addToCartResult.getErrorMessage()).thenReturn("Not a number");
+        when(cartServiceMethodsResult.getErrorMessage()).thenReturn("Not a number");
         servlet.doPost(request, response);
 
         verify(request).setAttribute("error", "Not a number");
@@ -105,7 +104,7 @@ public class ProductDetailsPageServletTest {
     public void testDoPostWithNumberFormatException() throws IOException, ServletException {
         boolean isError = true;
         when(cartService.add(request)).thenReturn(isError);
-        when(addToCartResult.getErrorMessage()).thenReturn("Not a number");
+        when(cartServiceMethodsResult.getErrorMessage()).thenReturn("Not a number");
         servlet.doPost(request, response);
 
         verify(request).setAttribute("error", "Not a number");
@@ -115,7 +114,7 @@ public class ProductDetailsPageServletTest {
     public void testDoPostWithOutOfStockException() throws IOException, ServletException {
         boolean isError = true;
         when(cartService.add(request)).thenReturn(isError);
-        when(addToCartResult.getErrorMessage()).thenReturn("Out of stock. Max stock is 100");
+        when(cartServiceMethodsResult.getErrorMessage()).thenReturn("Out of stock. Max stock is 100");
         servlet.doPost(request, response);
 
         verify(request).setAttribute("error", "Out of stock. Max stock is 100");

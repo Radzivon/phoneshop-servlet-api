@@ -1,11 +1,9 @@
 package com.es.phoneshop.web;
 
-import com.es.phoneshop.model.cart.AddToCartResult;
 import com.es.phoneshop.model.cart.Cart;
 import com.es.phoneshop.model.cart.CartService;
+import com.es.phoneshop.model.cart.CartServiceMethodsResult;
 import com.es.phoneshop.model.cart.HttpSessionCartService;
-import com.es.phoneshop.model.product.Product;
-import com.es.phoneshop.model.product.ProductService;
 import com.es.phoneshop.model.recently.viewed.AddToRecentlyViewedProductsResult;
 import com.es.phoneshop.model.recently.viewed.HttpSessionRecentlyViewedProducts;
 import com.es.phoneshop.model.recently.viewed.RecentlyViewedProductsService;
@@ -19,9 +17,8 @@ import java.io.IOException;
 public class ProductDetailsPageServlet extends HttpServlet {
     private CartService cartService;
     private RecentlyViewedProductsService recentlyViewedProductsService;
-    private AddToCartResult addToCartResult;
+    private CartServiceMethodsResult cartServiceMethodsResult;
     private AddToRecentlyViewedProductsResult addToRecentlyViewedProductsResult;
-    private ProductService productService;
     private static final String PRODUCT = "product";
     private static final String JSP_PATH = "/WEB-INF/pages/product.jsp";
     private static final String CART = "cart";
@@ -29,11 +26,10 @@ public class ProductDetailsPageServlet extends HttpServlet {
     private static final String URL_MESSAGE = "?message=Added to cart successfully";
 
     @Override
-    public void init() throws ServletException {
+    public void init() {
         cartService = HttpSessionCartService.getInstance();
-        productService = new ProductService();
         recentlyViewedProductsService = HttpSessionRecentlyViewedProducts.getInstance();
-        addToCartResult = new AddToCartResult();
+        cartServiceMethodsResult = new CartServiceMethodsResult();
         addToRecentlyViewedProductsResult = new AddToRecentlyViewedProductsResult();
     }
 
@@ -41,13 +37,11 @@ public class ProductDetailsPageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Cart cart = cartService.getCart(request);
-        Long productsId = parseProductId(request);
-        Product product = productService.getProductById(productsId);
 
         recentlyViewedProductsService.add(request);
 
         request.setAttribute(CART, cart);
-        request.setAttribute(PRODUCT, product);
+        request.setAttribute(PRODUCT, addToRecentlyViewedProductsResult.getProduct());
         request.setAttribute(RECENTLY_VIEWED_PRODUCTS_SESSION_ATTRIBUTE, addToRecentlyViewedProductsResult.getProducts());
 
         request.getRequestDispatcher(JSP_PATH).forward(request, response);
@@ -58,19 +52,14 @@ public class ProductDetailsPageServlet extends HttpServlet {
 
         boolean hasError = cartService.add(request);
         if (hasError) {
-            request.setAttribute("error", addToCartResult.getErrorMessage());
+            request.setAttribute("error", cartServiceMethodsResult.getErrorMessage());
             doGet(request, response);
             return;
         }
 
-        request.setAttribute(CART, addToCartResult.getCart());
-        request.setAttribute(PRODUCT, addToCartResult.getProduct());
+        request.setAttribute(CART, cartServiceMethodsResult.getCart());
+        request.setAttribute(PRODUCT, cartServiceMethodsResult.getProduct());
         response.sendRedirect(request.getRequestURI() + URL_MESSAGE);
 
-    }
-
-    public Long parseProductId(HttpServletRequest request) {
-        return Long.valueOf(request.getPathInfo()
-                .substring(1));
     }
 }

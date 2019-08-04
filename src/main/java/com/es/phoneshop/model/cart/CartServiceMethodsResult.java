@@ -2,17 +2,26 @@ package com.es.phoneshop.model.cart;
 
 import com.es.phoneshop.model.product.Product;
 
-public class AddToCartResult {
+public class CartServiceMethodsResult {
     private static Cart cart;
     private static Product product;
     private static String errorMessage;
+    private static String[] errors;
+
+    public String[] getErrors() {
+        return errors;
+    }
+
+    public  void setErrors(String[] errors) {
+        CartServiceMethodsResult.errors = errors;
+    }
 
     public String getErrorMessage() {
         return errorMessage;
     }
 
     public void setErrorMessage(String errorMessage) {
-        AddToCartResult.errorMessage = errorMessage;
+        CartServiceMethodsResult.errorMessage = errorMessage;
     }
 
     public Cart getCart() {
@@ -20,7 +29,7 @@ public class AddToCartResult {
     }
 
     public void setCart(Cart cart) {
-        AddToCartResult.cart = cart;
+        CartServiceMethodsResult.cart = cart;
     }
 
     public Product getProduct() {
@@ -28,6 +37,6 @@ public class AddToCartResult {
     }
 
     public void setProduct(Product product) {
-        AddToCartResult.product = product;
+        CartServiceMethodsResult.product = product;
     }
 }

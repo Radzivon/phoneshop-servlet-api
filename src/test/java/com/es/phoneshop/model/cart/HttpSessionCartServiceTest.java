@@ -5,7 +5,6 @@ import com.es.phoneshop.model.product.ProductDao;
 import com.es.phoneshop.model.recently.viewed.HttpSessionRecentlyViewedProducts;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -14,11 +13,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
+import java.text.ParseException;
+import java.util.Collections;
 import java.util.Locale;
+import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -33,22 +33,26 @@ public class HttpSessionCartServiceTest {
     @Mock
     private ProductDao productDao;
     @Mock
-    private AddToCartResult addToCartResult;
+    private CartServiceMethodsResult cartServiceMethodsResult;
     @Mock
     private Cart cart;
+    @Mock
+    private CartItem cartItem;
+
 
     @InjectMocks
     private HttpSessionCartService httpSessionCartService;
     private Locale locale = Locale.US;
+    private Optional<CartItem> optionalCartItem;
 
 
     @Before
     public void setup() {
-        // when(productDao.getProduct(anyLong())).thenReturn(product);
         when(request.getSession()).thenReturn(session);
         when(session.getAttribute(anyString())).thenReturn(cart);
         when(httpSessionCartService.getCart(request)).thenReturn(cart);
-        //  when(request.getLocale()).thenReturn(locale);
+        when(request.getLocale()).thenReturn(locale);
+        when(productDao.getProduct(anyLong())).thenReturn(product);
     }
 
     @Test
@@ -78,10 +82,29 @@ public class HttpSessionCartServiceTest {
         Assert.assertNotNull(temp);
     }
 
-    @Ignore
     @Test
-    public void add() {
+    public void addWithOutOfStockException() {
+        int stock = 0;
+        when(product.getStock()).thenReturn(stock);
+        when(request.getParameter("quantity")).thenReturn("1");
+        when(request.getPathInfo()).thenReturn("/1");
 
+        httpSessionCartService.add(request);
+        verify(cartServiceMethodsResult).setErrorMessage("Out of stock. Max stock is " + stock);
     }
 
+    @Test
+    public void addWithNumberFormatException() {
+        when(request.getParameter("quantity")).thenReturn("1");
+        when(request.getPathInfo()).thenReturn("null");
+        httpSessionCartService.add(request);
+        verify(cartServiceMethodsResult).setErrorMessage("Not a number");
+    }
+
+    @Test
+    public void addWithParseException() {
+        when(request.getParameter("quantity")).thenReturn("null");
+        httpSessionCartService.add(request);
+        verify(cartServiceMethodsResult).setErrorMessage("Not a number");
+    }
 }
