@@ -4,7 +4,7 @@ import com.es.phoneshop.model.product.ArrayListProductDao;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.ProductDao;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,7 +13,6 @@ public class HttpSessionRecentlyViewedProducts implements RecentlyViewedProducts
     private static final int MAX_QUANTITY_PRODUCTS = 3;
     private static HttpSessionRecentlyViewedProducts instance = new HttpSessionRecentlyViewedProducts();
     private ProductDao productDao;
-    private AddToRecentlyViewedProductsResult addToRecentlyViewedProductsResult = new AddToRecentlyViewedProductsResult();
 
     private HttpSessionRecentlyViewedProducts() {
         productDao = ArrayListProductDao.getInstance();
@@ -24,31 +23,33 @@ public class HttpSessionRecentlyViewedProducts implements RecentlyViewedProducts
     }
 
     @Override
-    public List<Product> getRecentlyViewedProducts(HttpServletRequest request) {
-        List<Product> recentlyViewedProducts = (List<Product>) request.getSession().getAttribute(RECENTLY_VIEWED_PRODUCTS_SESSION_ATTRIBUTE);
+    public List<Product> getRecentlyViewedProducts(HttpSession session) {
+        List<Product> recentlyViewedProducts = (List<Product>) session.getAttribute(RECENTLY_VIEWED_PRODUCTS_SESSION_ATTRIBUTE);
         if (recentlyViewedProducts == null) {
             recentlyViewedProducts = new LinkedList<>();
-            request.getSession().setAttribute(RECENTLY_VIEWED_PRODUCTS_SESSION_ATTRIBUTE, recentlyViewedProducts);
+            session.setAttribute(RECENTLY_VIEWED_PRODUCTS_SESSION_ATTRIBUTE, recentlyViewedProducts);
         }
         return recentlyViewedProducts;
     }
 
     @Override
-    public void add(HttpServletRequest request) {
-        LinkedList<Product> recentlyViewedProducts = (LinkedList<Product>) getRecentlyViewedProducts(request);
-
-        Product product = productDao.getProduct(parseProductId(request));
+    public AddToRecentlyViewedProductsResult add(HttpSession session, String requestPathInfo) {
+        LinkedList<Product> recentlyViewedProducts = (LinkedList<Product>) getRecentlyViewedProducts(session);
+        AddToRecentlyViewedProductsResult addToRecentlyViewedProductsResult = new AddToRecentlyViewedProductsResult();
+        Product product = productDao.getProduct(parseProductId(requestPathInfo));
         recentlyViewedProducts.remove(product);
         if (recentlyViewedProducts.size() == MAX_QUANTITY_PRODUCTS) {
             recentlyViewedProducts.removeLast();
         }
+
         recentlyViewedProducts.addFirst(product);
         addToRecentlyViewedProductsResult.setProduct(product);
         addToRecentlyViewedProductsResult.setProducts(recentlyViewedProducts);
+        return addToRecentlyViewedProductsResult;
     }
 
-    public Long parseProductId(HttpServletRequest request) {
-        return Long.valueOf(request.getPathInfo()
+    public Long parseProductId(String requestPathInfo) {
+        return Long.valueOf(requestPathInfo
                 .substring(1));
     }
 }

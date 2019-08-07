@@ -12,33 +12,35 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Locale;
 
 public class ProductDetailsPageServlet extends HttpServlet {
     private CartService cartService;
     private RecentlyViewedProductsService recentlyViewedProductsService;
-    private CartServiceMethodsResult cartServiceMethodsResult;
-    private AddToRecentlyViewedProductsResult addToRecentlyViewedProductsResult;
     private static final String PRODUCT = "product";
     private static final String JSP_PATH = "/WEB-INF/pages/product.jsp";
     private static final String CART = "cart";
     private static final String RECENTLY_VIEWED_PRODUCTS_SESSION_ATTRIBUTE = "recentlyviewed";
     private static final String URL_MESSAGE = "?message=Added to cart successfully";
+    private static final String QUANTITY = "quantity";
+    private static final String ERROR = "error";
 
     @Override
     public void init() {
         cartService = HttpSessionCartService.getInstance();
         recentlyViewedProductsService = HttpSessionRecentlyViewedProducts.getInstance();
-        cartServiceMethodsResult = new CartServiceMethodsResult();
-        addToRecentlyViewedProductsResult = new AddToRecentlyViewedProductsResult();
     }
 
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Cart cart = cartService.getCart(request);
+        HttpSession session = request.getSession();
+        Cart cart = cartService.getCart(session);
+        String requestPathInfo = request.getPathInfo();
 
-        recentlyViewedProductsService.add(request);
+        AddToRecentlyViewedProductsResult addToRecentlyViewedProductsResult = recentlyViewedProductsService.add(session, requestPathInfo);
 
         request.setAttribute(CART, cart);
         request.setAttribute(PRODUCT, addToRecentlyViewedProductsResult.getProduct());
@@ -49,10 +51,13 @@ public class ProductDetailsPageServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-        boolean hasError = cartService.add(request);
-        if (hasError) {
-            request.setAttribute("error", cartServiceMethodsResult.getErrorMessage());
+        HttpSession session = request.getSession();
+        String requestPathInfo = request.getPathInfo();
+        String quantity = request.getParameter(QUANTITY);
+        Locale locale = request.getLocale();
+        CartServiceMethodsResult cartServiceMethodsResult = cartService.add(session, requestPathInfo, quantity, locale);
+        if (cartServiceMethodsResult.hasError()) {
+            request.setAttribute(ERROR, cartServiceMethodsResult.getErrorMessage());
             doGet(request, response);
             return;
         }

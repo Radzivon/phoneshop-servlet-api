@@ -40,9 +40,20 @@ public class Cart {
         this.totalQuantity = totalQuantity;
     }
 
+    void recalculateCart() {
+        BigDecimal totalCost = new BigDecimal(0);
+        int totalQuantity = 0;
+        for (CartItem cartItem : cartItems) {
+            totalCost = totalCost.add(cartItem.getProduct().getPrice()
+                    .multiply(new BigDecimal(cartItem.getQuantity())));
+            totalQuantity += cartItem.getQuantity();
+        }
+        this.totalCost = totalCost;
+        this.totalQuantity = totalQuantity;
+    }
+
     @Override
     public String toString() {
         return "Quantity: " + totalQuantity + " Total: " + totalCost + Currency.getInstance(Locale.US) + cartItems;
-
     }
 }

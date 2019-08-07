@@ -14,6 +14,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -29,6 +30,8 @@ public class CartPageServletTest {
     @Mock
     private RequestDispatcher requestDispatcher;
     @Mock
+    private HttpSession session;
+    @Mock
     private CartService cartService;
     @Mock
     private CartServiceMethodsResult cartServiceMethodsResult;
@@ -36,18 +39,24 @@ public class CartPageServletTest {
     private Cart cart;
     @InjectMocks
     private CartPageServlet servlet;
+
     private String[] errors;
+    private String[] productsIds;
+    private String[] quantities;
 
     @Before
     public void setup() {
         when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
+        when(request.getSession()).thenReturn(session);
         when(cartServiceMethodsResult.getCart()).thenReturn(cart);
         errors = new String[1];
+        productsIds = new String[1];
+        quantities = new String[1];
     }
 
     @Test
     public void testDoGet() throws ServletException, IOException {
-        when(cartService.getCart(request)).thenReturn(cart);
+        when(cartService.getCart(session)).thenReturn(cart);
 
         servlet.doGet(request, response);
 
@@ -58,7 +67,10 @@ public class CartPageServletTest {
 
     @Test
     public void testDoPostWithErrors() throws ServletException, IOException {
-        when(cartService.update(request)).thenReturn(true);
+        when(request.getParameterValues("productId")).thenReturn(productsIds);
+        when(request.getParameterValues("quantity")).thenReturn(quantities);
+        when(cartService.update(session, productsIds, quantities)).thenReturn(cartServiceMethodsResult);
+        when(cartServiceMethodsResult.hasError()).thenReturn(true);
         when(cartServiceMethodsResult.getErrors()).thenReturn(errors);
 
         servlet.doPost(request, response);
@@ -66,9 +78,13 @@ public class CartPageServletTest {
         verify(request).setAttribute("errors", cartServiceMethodsResult.getErrors());
     }
 
+
     @Test
     public void testDoPostWithoutErrors() throws ServletException, IOException {
-        when(cartService.update(request)).thenReturn(false);
+        when(request.getParameterValues("productId")).thenReturn(productsIds);
+        when(request.getParameterValues("quantity")).thenReturn(quantities);
+        when(cartService.update(session, productsIds, quantities)).thenReturn(cartServiceMethodsResult);
+        when(cartServiceMethodsResult.hasError()).thenReturn(false);
         when(request.getRequestURI()).thenReturn("contextPath");
 
         servlet.doPost(request, response);

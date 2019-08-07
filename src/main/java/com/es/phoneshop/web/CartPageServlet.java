@@ -9,25 +9,26 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 public class CartPageServlet extends HttpServlet {
     private CartService cartService;
-    private CartServiceMethodsResult cartServiceMethodsResult;
     private static final String JSP_PATH = "/WEB-INF/pages/cart.jsp";
     private static final String CART = "cart";
     private static final String URL_MESSAGE = "?message=Updated successfully";
+    private static final String QUANTITY = "quantity";
 
     @Override
     public void init() {
         cartService = HttpSessionCartService.getInstance();
-        cartServiceMethodsResult = new CartServiceMethodsResult();
     }
 
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Cart cart = cartService.getCart(request);
+        HttpSession session = request.getSession();
+        Cart cart = cartService.getCart(session);
 
         request.setAttribute(CART, cart);
 
@@ -36,9 +37,13 @@ public class CartPageServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        boolean hasError = cartService.update(request);
+        String[] productIds = request.getParameterValues("productId");
+        String[] quantities = request.getParameterValues("quantity");
+        HttpSession session = request.getSession();
 
-        if (hasError) {
+        CartServiceMethodsResult cartServiceMethodsResult = cartService.update(session, productIds, quantities);
+
+        if (cartServiceMethodsResult.hasError()) {
             request.setAttribute("errors", cartServiceMethodsResult.getErrors());
             doGet(request, response);
         } else {
@@ -47,5 +52,6 @@ public class CartPageServlet extends HttpServlet {
                     URL_MESSAGE);
         }
     }
+
 
 }

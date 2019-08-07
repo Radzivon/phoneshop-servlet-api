@@ -20,7 +20,6 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProductDemodataServletContextListenerTest {
-
     @Mock
     private ServletContextEvent servletContextEvent;
     @Mock

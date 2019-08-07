@@ -12,6 +12,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 import static org.mockito.Mockito.verify;
@@ -26,20 +27,25 @@ public class CartItemDeleteServletTest {
     @Mock
     private RequestDispatcher requestDispatcher;
     @Mock
+    private HttpSession session;
+    @Mock
     private CartService cartService;
     @InjectMocks
     private CartItemDeleteServlet servlet;
+    private final String requestPathInfo = "/1";
 
     @Before
     public void setup() {
         when(request.getContextPath()).thenReturn("contextPath");
+        when(request.getPathInfo()).thenReturn(requestPathInfo);
+        when(request.getSession()).thenReturn(session);
     }
 
     @Test
     public void testDoPost() throws ServletException, IOException {
         servlet.doPost(request, response);
 
-        verify(cartService).delete(request);
+        verify(cartService).delete(session, requestPathInfo);
         verify(response).sendRedirect("contextPath" + "/cart");
 
     }

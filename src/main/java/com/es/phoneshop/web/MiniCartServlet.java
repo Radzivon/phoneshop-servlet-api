@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 public class MiniCartServlet extends HttpServlet {
@@ -16,13 +17,14 @@ public class MiniCartServlet extends HttpServlet {
     private static final String CART = "cart";
 
     @Override
-    public void init() throws ServletException {
+    public void init() {
         cartService = HttpSessionCartService.getInstance();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Cart cart = cartService.getCart(request);
+        HttpSession session = request.getSession();
+        Cart cart = cartService.getCart(session);
 
         request.setAttribute(CART, cart);
 

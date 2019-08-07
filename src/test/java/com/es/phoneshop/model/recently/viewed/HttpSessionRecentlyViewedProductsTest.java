@@ -4,6 +4,7 @@ import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.ProductDao;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -38,29 +39,27 @@ public class HttpSessionRecentlyViewedProductsTest {
     @Before
     public void setup() {
         when(productDao.getProduct(anyLong())).thenReturn(product);
-        when(request.getSession()).thenReturn(session);
         when(session.getAttribute(anyString())).thenReturn(recentlyViewedProducts);
-        when(httpSessionRecentlyViewedProducts.getRecentlyViewedProducts(request)).thenReturn(recentlyViewedProducts);
+        when(httpSessionRecentlyViewedProducts.getRecentlyViewedProducts(session)).thenReturn(recentlyViewedProducts);
     }
 
     @Test
     public void testParseId() {
-        when(request.getPathInfo()).thenReturn("/1");
+        String requestPathInfo = "/1";
         Long expectedId = 1L;
-        Long actualId = httpSessionRecentlyViewedProducts.parseProductId(request);
+        Long actualId = httpSessionRecentlyViewedProducts.parseProductId(requestPathInfo);
         Assert.assertEquals(expectedId, actualId);
     }
 
+
     @Test(expected = NumberFormatException.class)
     public void testParseIdIncorrectPath() {
-        when(request.getPathInfo()).thenReturn("null");
-        httpSessionRecentlyViewedProducts.parseProductId(request);
+        String requestPathInfo = "null";
+        httpSessionRecentlyViewedProducts.parseProductId(requestPathInfo);
     }
-
     @Test
     public void getRecentlyViewedProductsListNull() {
-
-        httpSessionRecentlyViewedProducts.getRecentlyViewedProducts(request);
+        httpSessionRecentlyViewedProducts.getRecentlyViewedProducts(session);
 
         verify(session).getAttribute("recentlyviewed");
     }
@@ -71,28 +70,29 @@ public class HttpSessionRecentlyViewedProductsTest {
         Assert.assertNotNull(temp);
     }
 
-
     @Test
     public void addWithSizeThree() {
+        String requestPathInfo = "/1";
         int listSize = 3;
         when(recentlyViewedProducts.size()).thenReturn(listSize);
-        when(request.getPathInfo()).thenReturn("/1");
+        when(httpSessionRecentlyViewedProducts.getRecentlyViewedProducts(session)).thenReturn(recentlyViewedProducts);
 
-        httpSessionRecentlyViewedProducts.add(request);
+        httpSessionRecentlyViewedProducts.add(session, requestPathInfo);
 
+        verify(recentlyViewedProducts).addFirst(product);
         verify(recentlyViewedProducts).removeLast();
     }
+
 
     @Test
     public void addFirstElement() {
         int listSize = 0;
+        String requestPathInfo = "/1";
         when(recentlyViewedProducts.size()).thenReturn(listSize);
-        when(request.getPathInfo()).thenReturn("/1");
 
-        httpSessionRecentlyViewedProducts.add(request);
+        httpSessionRecentlyViewedProducts.add(session, requestPathInfo);
 
         verify(recentlyViewedProducts, never()).removeLast();
         verify(recentlyViewedProducts).addFirst(product);
-        verify(addToRecentlyViewedProductsResult).setProducts(recentlyViewedProducts);
     }
 }

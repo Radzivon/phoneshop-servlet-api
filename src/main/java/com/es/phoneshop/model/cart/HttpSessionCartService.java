@@ -5,8 +5,7 @@ import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.ProductDao;
 import com.es.phoneshop.model.product.ProductService;
 
-import javax.servlet.http.HttpServletRequest;
-import java.math.BigDecimal;
+import javax.servlet.http.HttpSession;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
@@ -17,13 +16,11 @@ public class HttpSessionCartService implements CartService {
     private static HttpSessionCartService instance = new HttpSessionCartService();
     private ProductDao productDao;
     private ProductService productService;
-    private CartServiceMethodsResult cartServiceMethodsResult;
-    private static final String QUANTITY = "quantity";
+
 
     private HttpSessionCartService() {
         productDao = ArrayListProductDao.getInstance();
         productService = ProductService.getInstance();
-        cartServiceMethodsResult = new CartServiceMethodsResult();
     }
 
     public static HttpSessionCartService getInstance() {
@@ -31,71 +28,65 @@ public class HttpSessionCartService implements CartService {
     }
 
     @Override
-    public Cart getCart(HttpServletRequest request) {
-        Cart cart = (Cart) request.getSession().getAttribute(CART_SESSION_ATTRIBUTE);
+    public Cart getCart(HttpSession session) {
+        Cart cart = (Cart) session.getAttribute(CART_SESSION_ATTRIBUTE);
         if (cart == null) {
             cart = new Cart();
-            request.getSession().setAttribute(CART_SESSION_ATTRIBUTE, cart);
+            session.setAttribute(CART_SESSION_ATTRIBUTE, cart);
         }
         return cart;
     }
 
     @Override
-    public boolean add(HttpServletRequest request) {
+    public CartServiceMethodsResult add(HttpSession session, String requestPathInfo, String stringQuantity, Locale locale) {
         boolean hasError = false;
-        Cart cart = getCart(request);
+        Cart cart = getCart(session);
+        CartServiceMethodsResult cartServiceMethodsResult = new CartServiceMethodsResult();
+        Long productId;
+        int quantity;
+
         try {
-            int quantity = parseQuantity(request);
-
-            Long productId = parseProductId(request);
-            Product product = productDao.getProduct(productId);
-            if (quantity > product.getStock()) {
-                throw new OutOfStockException(product.getStock());
-            }
-            Optional<CartItem> optionalCartItem = cart.getCartItems().stream()
-                    .filter(cartItem -> cartItem.getProduct().equals(product)).findFirst();
-            if (optionalCartItem.isPresent()) {
-                CartItem cartItem = optionalCartItem.get();
-                int totalQuantity = cartItem.getQuantity() + quantity;
-                cartItem.setQuantity(totalQuantity);
-            } else {
-                cart.getCartItems().add(new CartItem(product, quantity));
-            }
-
-            recalculateCart(cart);
-
-            cartServiceMethodsResult.setCart(cart);
-            cartServiceMethodsResult.setProduct(product);
-
+            productId = parseProductId(requestPathInfo);
+            quantity = parseQuantity(stringQuantity, locale);
         } catch (NumberFormatException | ParseException exception) {
+            hasError = true;
             cartServiceMethodsResult.setErrorMessage("Not a number");
-            hasError = true;
-        } catch (OutOfStockException exception) {
-            cartServiceMethodsResult.setErrorMessage("Out of stock. Max stock is " + exception.getMaxStock());
-            hasError = true;
+            cartServiceMethodsResult.setHasError(hasError);
+            return cartServiceMethodsResult;
         }
-        return hasError;
-    }
+        Product product = productDao.getProduct(productId);
 
-     void recalculateCart(Cart cart) {
-        BigDecimal totalCost = new BigDecimal(0);
-        int totalQuantity = 0;
-        for (CartItem cartItem : cart.getCartItems()) {
-            totalCost = totalCost.add(cartItem.getProduct().getPrice()
-                    .multiply(new BigDecimal(cartItem.getQuantity())));
-            totalQuantity += cartItem.getQuantity();
+        if (quantity > product.getStock()) {
+            hasError = true;
+            cartServiceMethodsResult.setErrorMessage("Out of stock. Max stock is " + product.getStock());
+            cartServiceMethodsResult.setHasError(hasError);
+            return cartServiceMethodsResult;
         }
-        cart.setTotalCost(totalCost);
-        cart.setTotalQuantity(totalQuantity);
+
+        Optional<CartItem> optionalCartItem = cart.getCartItems().stream()
+                .filter(cartItem -> cartItem.getProduct().equals(product)).findFirst();
+        if (optionalCartItem.isPresent()) {
+            CartItem cartItem = optionalCartItem.get();
+            int totalQuantity = cartItem.getQuantity() + quantity;
+            cartItem.setQuantity(totalQuantity);
+        } else {
+            cart.getCartItems().add(new CartItem(product, quantity));
+        }
+
+        cart.recalculateCart();
+
+        cartServiceMethodsResult.setCart(cart);
+        cartServiceMethodsResult.setProduct(product);
+        cartServiceMethodsResult.setHasError(hasError);
+        return cartServiceMethodsResult;
     }
 
     @Override
-    public boolean update(HttpServletRequest request) {
-        String[] productIds = request.getParameterValues("productId");
-        String[] quantities = request.getParameterValues("quantity");
+    public CartServiceMethodsResult update(HttpSession session, String[] productIds, String[] quantities) {
+        CartServiceMethodsResult cartServiceMethodsResult = new CartServiceMethodsResult();
 
         boolean hasError = false;
-        Cart cart = getCart(request);
+        Cart cart = getCart(session);
         String[] errors = new String[productIds.length];
         for (int i = 0; i < productIds.length; i++) {
             Long productId = Long.valueOf(productIds[i]);
@@ -107,49 +98,48 @@ public class HttpSessionCartService implements CartService {
                 hasError = true;
                 continue;
             }
-            try {
-                update(cart, productId, quantity);
-            } catch (OutOfStockException exception) {
-                errors[i] = "Out of stock. Max stock is " + exception.getMaxStock();
+
+            boolean checkError = update(cart, productId, quantity);
+            if (checkError) {
+                errors[i] = "Out of stock. Max stock is " + productService.getProductById(productId).getStock();
                 hasError = true;
             }
         }
         cartServiceMethodsResult.setCart(cart);
+        cartServiceMethodsResult.setHasError(hasError);
         cartServiceMethodsResult.setErrors(errors);
+        return cartServiceMethodsResult;
+    }
+
+    private boolean update(Cart cart, Long productId, int quantity) {
+        boolean hasError = false;
+        Product product = productService.getProductById(productId);
+        if (quantity > product.getStock()) {
+            hasError = true;
+            return hasError;
+        }
+        cart.getCartItems().stream()
+                .filter(cartItem -> cartItem.getProduct().equals(product)).findFirst()
+                .ifPresent(cartItem -> cartItem.setQuantity(quantity));
+
+        cart.recalculateCart();
         return hasError;
     }
 
-    private boolean update(Cart cart, Long productId, int quantity) throws OutOfStockException {
-        Product product = productService.getProductById(productId);
-        if (quantity > product.getStock()) {
-            throw new OutOfStockException(product.getStock());
-        }
-        Optional<CartItem> cartItemOptional = cart.getCartItems().stream()
-                .filter(cartItem -> cartItem.getProduct().equals(product)).findFirst();
-        CartItem cartItem = cartItemOptional.get();
-        if (cartItemOptional.isPresent()) {
-            cartItem.setQuantity(quantity);
-        }
-        recalculateCart(cart);
-        return false;
-    }
-
     @Override
-    public void delete(HttpServletRequest request) {
-        Cart cart = getCart(request);
-        Long productId = parseProductId(request);
+    public void delete(HttpSession session, String requestPathInfo) {
+        Cart cart = getCart(session);
+        Long productId = parseProductId(requestPathInfo);
 
         cart.getCartItems().removeIf(cartItem -> cartItem.getProduct().getId().equals(productId));
-        recalculateCart(cart);
+        cart.recalculateCart();
     }
 
-    Long parseProductId(HttpServletRequest request) {
-        return Long.valueOf(request.getPathInfo()
-                .substring(1));
+    Long parseProductId(String requestPathInfo) {
+        return Long.valueOf(requestPathInfo.substring(1));
     }
 
-    int parseQuantity(HttpServletRequest request) throws ParseException {
-        Locale locale = request.getLocale();
-        return NumberFormat.getInstance(locale).parse(request.getParameter(QUANTITY)).intValue();
+    int parseQuantity(String quantity, Locale locale) throws ParseException {
+        return NumberFormat.getInstance(locale).parse(quantity).intValue();
     }
 }
