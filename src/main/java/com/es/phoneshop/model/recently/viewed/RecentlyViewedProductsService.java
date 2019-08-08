@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface RecentlyViewedProductsService {
     List<Product> getRecentlyViewedProducts(HttpSession session);
-    AddToRecentlyViewedProductsResult add(HttpSession session, String requestPathInfo);
+    AddToRecentlyViewedProductsResult add(HttpSession session, String productId);
 }

@@ -1,9 +1,6 @@
 package com.es.phoneshop.web;
 
-import com.es.phoneshop.model.cart.Cart;
-import com.es.phoneshop.model.cart.CartService;
-import com.es.phoneshop.model.cart.CartServiceMethodsResult;
-import com.es.phoneshop.model.cart.HttpSessionCartService;
+import com.es.phoneshop.model.cart.*;
 import com.es.phoneshop.model.recently.viewed.AddToRecentlyViewedProductsResult;
 import com.es.phoneshop.model.recently.viewed.HttpSessionRecentlyViewedProducts;
 import com.es.phoneshop.model.recently.viewed.RecentlyViewedProductsService;
@@ -14,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Locale;
 
 public class ProductDetailsPageServlet extends HttpServlet {
     private CartService cartService;
@@ -38,9 +34,9 @@ public class ProductDetailsPageServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         Cart cart = cartService.getCart(session);
-        String requestPathInfo = request.getPathInfo();
+        String stringProductId = request.getPathInfo().substring(1);
 
-        AddToRecentlyViewedProductsResult addToRecentlyViewedProductsResult = recentlyViewedProductsService.add(session, requestPathInfo);
+        AddToRecentlyViewedProductsResult addToRecentlyViewedProductsResult = recentlyViewedProductsService.add(session, stringProductId);
 
         request.setAttribute(CART, cart);
         request.setAttribute(PRODUCT, addToRecentlyViewedProductsResult.getProduct());
@@ -52,18 +48,18 @@ public class ProductDetailsPageServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        String requestPathInfo = request.getPathInfo();
+        String stringProductId= request.getPathInfo().substring(1);
         String quantity = request.getParameter(QUANTITY);
-        Locale locale = request.getLocale();
-        CartServiceMethodsResult cartServiceMethodsResult = cartService.add(session, requestPathInfo, quantity, locale);
-        if (cartServiceMethodsResult.hasError()) {
-            request.setAttribute(ERROR, cartServiceMethodsResult.getErrorMessage());
+
+        AddCartResult addCartResult = cartService.add(session, stringProductId, quantity);
+        if (addCartResult.hasError()) {
+            request.setAttribute(ERROR, addCartResult.getErrorMessage());
             doGet(request, response);
             return;
         }
 
-        request.setAttribute(CART, cartServiceMethodsResult.getCart());
-        request.setAttribute(PRODUCT, cartServiceMethodsResult.getProduct());
+        request.setAttribute(CART, addCartResult.getCart());
+        request.setAttribute(PRODUCT, addCartResult.getProduct());
         response.sendRedirect(request.getRequestURI() + URL_MESSAGE);
 
     }

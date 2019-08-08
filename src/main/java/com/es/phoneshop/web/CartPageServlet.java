@@ -2,7 +2,7 @@ package com.es.phoneshop.web;
 
 import com.es.phoneshop.model.cart.Cart;
 import com.es.phoneshop.model.cart.CartService;
-import com.es.phoneshop.model.cart.CartServiceMethodsResult;
+import com.es.phoneshop.model.cart.UpdateCartResult;
 import com.es.phoneshop.model.cart.HttpSessionCartService;
 
 import javax.servlet.ServletException;
@@ -41,13 +41,13 @@ public class CartPageServlet extends HttpServlet {
         String[] quantities = request.getParameterValues("quantity");
         HttpSession session = request.getSession();
 
-        CartServiceMethodsResult cartServiceMethodsResult = cartService.update(session, productIds, quantities);
+        UpdateCartResult updateCartResult = cartService.update(session, productIds, quantities);
 
-        if (cartServiceMethodsResult.hasError()) {
-            request.setAttribute("errors", cartServiceMethodsResult.getErrors());
+        if (updateCartResult.hasError()) {
+            request.setAttribute("errors", updateCartResult.getErrors());
             doGet(request, response);
         } else {
-            request.setAttribute(CART, cartServiceMethodsResult.getCart());
+            request.setAttribute(CART, updateCartResult.getCart());
             response.sendRedirect(request.getRequestURI() +
                     URL_MESSAGE);
         }

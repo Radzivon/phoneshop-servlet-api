@@ -2,28 +2,11 @@ package com.es.phoneshop.model.cart;
 
 import com.es.phoneshop.model.product.Product;
 
-public class CartServiceMethodsResult {
+public class AddCartResult {
+    private boolean hasError;
     private Cart cart;
     private Product product;
     private String errorMessage;
-    private String[] errors;
-    private boolean hasError;
-
-    public String[] getErrors() {
-        return errors;
-    }
-
-    public void setErrors(String[] errors) {
-        this.errors = errors;
-    }
-
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
-    }
 
     public Cart getCart() {
         return cart;
@@ -41,6 +24,14 @@ public class CartServiceMethodsResult {
         this.product = product;
     }
 
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
     public boolean hasError() {
         return hasError;
     }
@@ -48,6 +39,4 @@ public class CartServiceMethodsResult {
     public void setHasError(boolean hasError) {
         this.hasError = hasError;
     }
-
-
 }

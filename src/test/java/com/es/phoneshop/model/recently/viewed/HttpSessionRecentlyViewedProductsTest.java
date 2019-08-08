@@ -4,7 +4,6 @@ import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.ProductDao;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -29,8 +28,6 @@ public class HttpSessionRecentlyViewedProductsTest {
     @Mock
     private ProductDao productDao;
     @Mock
-    private AddToRecentlyViewedProductsResult addToRecentlyViewedProductsResult;
-    @Mock
     private LinkedList<Product> recentlyViewedProducts;
     @InjectMocks
     HttpSessionRecentlyViewedProducts httpSessionRecentlyViewedProducts;
@@ -45,9 +42,9 @@ public class HttpSessionRecentlyViewedProductsTest {
 
     @Test
     public void testParseId() {
-        String requestPathInfo = "/1";
+        String productId = "1";
         Long expectedId = 1L;
-        Long actualId = httpSessionRecentlyViewedProducts.parseProductId(requestPathInfo);
+        Long actualId = httpSessionRecentlyViewedProducts.parseProductId(productId);
         Assert.assertEquals(expectedId, actualId);
     }
 
@@ -72,12 +69,12 @@ public class HttpSessionRecentlyViewedProductsTest {
 
     @Test
     public void addWithSizeThree() {
-        String requestPathInfo = "/1";
+        String productId = "1";
         int listSize = 3;
         when(recentlyViewedProducts.size()).thenReturn(listSize);
         when(httpSessionRecentlyViewedProducts.getRecentlyViewedProducts(session)).thenReturn(recentlyViewedProducts);
 
-        httpSessionRecentlyViewedProducts.add(session, requestPathInfo);
+        httpSessionRecentlyViewedProducts.add(session, productId);
 
         verify(recentlyViewedProducts).addFirst(product);
         verify(recentlyViewedProducts).removeLast();
@@ -87,10 +84,10 @@ public class HttpSessionRecentlyViewedProductsTest {
     @Test
     public void addFirstElement() {
         int listSize = 0;
-        String requestPathInfo = "/1";
+        String productId = "1";
         when(recentlyViewedProducts.size()).thenReturn(listSize);
 
-        httpSessionRecentlyViewedProducts.add(session, requestPathInfo);
+        httpSessionRecentlyViewedProducts.add(session, productId);
 
         verify(recentlyViewedProducts, never()).removeLast();
         verify(recentlyViewedProducts).addFirst(product);

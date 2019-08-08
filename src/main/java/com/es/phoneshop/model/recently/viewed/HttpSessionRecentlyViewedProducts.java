@@ -48,8 +48,7 @@ public class HttpSessionRecentlyViewedProducts implements RecentlyViewedProducts
         return addToRecentlyViewedProductsResult;
     }
 
-    public Long parseProductId(String requestPathInfo) {
-        return Long.valueOf(requestPathInfo
-                .substring(1));
+    public Long parseProductId(String productId) {
+        return Long.valueOf(productId);
     }
 }

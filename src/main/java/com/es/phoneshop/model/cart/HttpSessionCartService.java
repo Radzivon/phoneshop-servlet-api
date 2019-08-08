@@ -6,9 +6,7 @@ import com.es.phoneshop.model.product.ProductDao;
 import com.es.phoneshop.model.product.ProductService;
 
 import javax.servlet.http.HttpSession;
-import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.Locale;
 import java.util.Optional;
 
 public class HttpSessionCartService implements CartService {
@@ -38,29 +36,29 @@ public class HttpSessionCartService implements CartService {
     }
 
     @Override
-    public CartServiceMethodsResult add(HttpSession session, String requestPathInfo, String stringQuantity, Locale locale) {
+    public AddCartResult add(HttpSession session, String stringProductId, String stringQuantity) {
         boolean hasError = false;
         Cart cart = getCart(session);
-        CartServiceMethodsResult cartServiceMethodsResult = new CartServiceMethodsResult();
+        AddCartResult addCartResult = new AddCartResult();
         Long productId;
         int quantity;
 
         try {
-            productId = parseProductId(requestPathInfo);
-            quantity = parseQuantity(stringQuantity, locale);
+            productId = parseProductId(stringProductId);
+            quantity = parseQuantity(stringQuantity);
         } catch (NumberFormatException | ParseException exception) {
             hasError = true;
-            cartServiceMethodsResult.setErrorMessage("Not a number");
-            cartServiceMethodsResult.setHasError(hasError);
-            return cartServiceMethodsResult;
+            addCartResult.setErrorMessage("Not a number");
+            addCartResult.setHasError(hasError);
+            return addCartResult;
         }
         Product product = productDao.getProduct(productId);
 
         if (quantity > product.getStock()) {
             hasError = true;
-            cartServiceMethodsResult.setErrorMessage("Out of stock. Max stock is " + product.getStock());
-            cartServiceMethodsResult.setHasError(hasError);
-            return cartServiceMethodsResult;
+            addCartResult.setErrorMessage("Out of stock. Max stock is " + product.getStock());
+            addCartResult.setHasError(hasError);
+            return addCartResult;
         }
 
         Optional<CartItem> optionalCartItem = cart.getCartItems().stream()
@@ -75,15 +73,15 @@ public class HttpSessionCartService implements CartService {
 
         cart.recalculateCart();
 
-        cartServiceMethodsResult.setCart(cart);
-        cartServiceMethodsResult.setProduct(product);
-        cartServiceMethodsResult.setHasError(hasError);
-        return cartServiceMethodsResult;
+        addCartResult.setCart(cart);
+        addCartResult.setProduct(product);
+        addCartResult.setHasError(hasError);
+        return addCartResult;
     }
 
     @Override
-    public CartServiceMethodsResult update(HttpSession session, String[] productIds, String[] quantities) {
-        CartServiceMethodsResult cartServiceMethodsResult = new CartServiceMethodsResult();
+    public UpdateCartResult update(HttpSession session, String[] productIds, String[] quantities) {
+        UpdateCartResult updateCartResult = new UpdateCartResult();
 
         boolean hasError = false;
         Cart cart = getCart(session);
@@ -105,10 +103,10 @@ public class HttpSessionCartService implements CartService {
                 hasError = true;
             }
         }
-        cartServiceMethodsResult.setCart(cart);
-        cartServiceMethodsResult.setHasError(hasError);
-        cartServiceMethodsResult.setErrors(errors);
-        return cartServiceMethodsResult;
+        updateCartResult.setCart(cart);
+        updateCartResult.setHasError(hasError);
+        updateCartResult.setErrors(errors);
+        return updateCartResult;
     }
 
     private boolean update(Cart cart, Long productId, int quantity) {
@@ -127,19 +125,19 @@ public class HttpSessionCartService implements CartService {
     }
 
     @Override
-    public void delete(HttpSession session, String requestPathInfo) {
+    public void delete(HttpSession session, String stringProductId) {
         Cart cart = getCart(session);
-        Long productId = parseProductId(requestPathInfo);
+        Long productId = parseProductId(stringProductId);
 
         cart.getCartItems().removeIf(cartItem -> cartItem.getProduct().getId().equals(productId));
         cart.recalculateCart();
     }
 
-    Long parseProductId(String requestPathInfo) {
-        return Long.valueOf(requestPathInfo.substring(1));
+    Long parseProductId(String stringProductId) {
+        return Long.valueOf(stringProductId);
     }
 
-    int parseQuantity(String quantity, Locale locale) throws ParseException {
-        return NumberFormat.getInstance(locale).parse(quantity).intValue();
+    int parseQuantity(String quantity) throws ParseException {
+        return Integer.valueOf(quantity);
     }
 }

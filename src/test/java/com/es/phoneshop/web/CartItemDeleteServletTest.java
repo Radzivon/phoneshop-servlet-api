@@ -25,14 +25,13 @@ public class CartItemDeleteServletTest {
     @Mock
     private HttpServletResponse response;
     @Mock
-    private RequestDispatcher requestDispatcher;
-    @Mock
     private HttpSession session;
     @Mock
     private CartService cartService;
     @InjectMocks
     private CartItemDeleteServlet servlet;
     private final String requestPathInfo = "/1";
+    private final String productId = "1";
 
     @Before
     public void setup() {
@@ -45,7 +44,7 @@ public class CartItemDeleteServletTest {
     public void testDoPost() throws ServletException, IOException {
         servlet.doPost(request, response);
 
-        verify(cartService).delete(session, requestPathInfo);
+        verify(cartService).delete(session, productId);
         verify(response).sendRedirect("contextPath" + "/cart");
 
     }
