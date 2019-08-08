@@ -1,12 +1,14 @@
 package com.es.phoneshop.web;
 
-import com.es.phoneshop.model.cart.*;
+import com.es.phoneshop.model.cart.AddCartResult;
+import com.es.phoneshop.model.cart.Cart;
+import com.es.phoneshop.model.cart.CartService;
+import com.es.phoneshop.model.cart.UpdateCartResult;
 import com.es.phoneshop.model.product.Product;
-import com.es.phoneshop.model.product.ProductDao;
-import com.es.phoneshop.model.product.ProductService;
 import com.es.phoneshop.model.recently.viewed.AddToRecentlyViewedProductsResult;
 import com.es.phoneshop.model.recently.viewed.RecentlyViewedProductsService;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -16,12 +18,10 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.LinkedList;
-import java.util.Locale;
 
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -35,9 +35,11 @@ public class ProductDetailsPageServletTest {
     @Mock
     private RequestDispatcher requestDispatcher;
     @Mock
+    private HttpSession session;
+    @Mock
     private CartService cartService;
     @Mock
-    private AddToCartResult addToCartResult;
+    private AddCartResult addCartResult;
     @Mock
     private AddToRecentlyViewedProductsResult addToRecentlyViewedProductsResult;
     @Mock
@@ -47,30 +49,33 @@ public class ProductDetailsPageServletTest {
     @Mock
     private LinkedList<Product> recentlyViewedProducts;
     @Mock
-    private ProductService productService;
-    @Mock
     private Product product;
-    @Mock
-    private ProductDao productDao;
     @InjectMocks
     private ProductDetailsPageServlet servlet;
-    private Locale locale = Locale.US;
+
+    private String requestPathInfo = "/1";
+    private String productId = "1";
+    private String quantity = "1";
+    private boolean hasError;
 
     @Before
-    public void setup() throws ServletException {
-        when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
-        when(request.getPathInfo()).thenReturn("/1");
-        when(productService.getProductById(anyLong())).thenReturn(product);
-        when(addToCartResult.getProduct()).thenReturn(product);
-        when(addToCartResult.getCart()).thenReturn(cart);
+    public void setup() {
+        when(request.getSession()).thenReturn(session);
+        when(cartService.getCart(session)).thenReturn(cart);
+        when(request.getPathInfo()).thenReturn(requestPathInfo);
+        when(recentlyViewedProductsService.add(session, productId)).thenReturn(addToRecentlyViewedProductsResult);
+        when(addToRecentlyViewedProductsResult.getProduct()).thenReturn(product);
         when(addToRecentlyViewedProductsResult.getProducts()).thenReturn(recentlyViewedProducts);
+
+        when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
+        when(request.getParameter("quantity")).thenReturn(quantity);
+        when(cartService.add(session, productId, quantity)).thenReturn(addCartResult);
     }
 
 
     @Test
     public void testDoGet() throws ServletException, IOException {
         servlet.doGet(request, response);
-
 
         verify(request).setAttribute("recentlyviewed", recentlyViewedProducts);
         verify(request).getRequestDispatcher("/WEB-INF/pages/product.jsp");
@@ -80,32 +85,39 @@ public class ProductDetailsPageServletTest {
 
     @Test
     public void testDoPost() throws IOException, ServletException {
+        hasError = false;
+        when(addCartResult.hasError()).thenReturn(hasError);
+        when(addCartResult.getCart()).thenReturn(cart);
+        when(addCartResult.getProduct()).thenReturn(product);
+        when(request.getParameter("quantity")).thenReturn("1");
         when(request.getRequestURI()).thenReturn("RequestURI");
 
         servlet.doPost(request, response);
 
         verify(request).setAttribute("cart", cart);
         verify(request).setAttribute("product", product);
-        verify(cartService).add(request);
         verify(response).sendRedirect("RequestURI?message=Added to cart successfully");
 
     }
 
     @Test
     public void testDoPostWithParseException() throws IOException, ServletException {
-        boolean isError = true;
-        when(cartService.add(request)).thenReturn(isError);
-        when(addToCartResult.getErrorMessage()).thenReturn("Not a number");
+        hasError = true;
+        when(addCartResult.getErrorMessage()).thenReturn("Not a number");
+        when(addCartResult.hasError()).thenReturn(hasError);
+
         servlet.doPost(request, response);
 
         verify(request).setAttribute("error", "Not a number");
     }
 
+
     @Test
     public void testDoPostWithNumberFormatException() throws IOException, ServletException {
-        boolean isError = true;
-        when(cartService.add(request)).thenReturn(isError);
-        when(addToCartResult.getErrorMessage()).thenReturn("Not a number");
+        hasError = true;
+        when(addCartResult.hasError()).thenReturn(hasError);
+        when(addCartResult.getErrorMessage()).thenReturn("Not a number");
+
         servlet.doPost(request, response);
 
         verify(request).setAttribute("error", "Not a number");
@@ -113,9 +125,9 @@ public class ProductDetailsPageServletTest {
 
     @Test
     public void testDoPostWithOutOfStockException() throws IOException, ServletException {
-        boolean isError = true;
-        when(cartService.add(request)).thenReturn(isError);
-        when(addToCartResult.getErrorMessage()).thenReturn("Out of stock. Max stock is 100");
+        hasError = true;
+        when(addCartResult.hasError()).thenReturn(hasError);
+        when(addCartResult.getErrorMessage()).thenReturn("Out of stock. Max stock is 100");
         servlet.doPost(request, response);
 
         verify(request).setAttribute("error", "Out of stock. Max stock is 100");

@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -20,7 +21,6 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProductDemodataServletContextListenerTest {
-
     @Mock
     private ServletContextEvent servletContextEvent;
     @Mock
@@ -29,11 +29,8 @@ public class ProductDemodataServletContextListenerTest {
     private Product product;
     @Mock
     private ProductDao productDao;
-    @Mock
-    ArrayListProductDao arrayListProductDao;
-    @Mock
-    List<Product> list;
-    @Spy
+
+    @InjectMocks
     private ProductDemodataServletContextListener productDemodataServletContextListener;
 
     @Before
@@ -45,7 +42,8 @@ public class ProductDemodataServletContextListenerTest {
     @Test
     public void testFillProductList() {
         when(servletContextEvent.getServletContext().getInitParameter("productDemodata")).thenReturn("true");
-        doReturn(Collections.singletonList(product)).when(productDemodataServletContextListener).fillProductList();
+       // doReturn(Collections.singletonList(product)).when(productDemodataServletContextListener).fillProductList();
+        when(productDemodataServletContextListener.fillProductList()).thenReturn(Collections.singletonList(product));
 
         productDemodataServletContextListener.contextInitialized(servletContextEvent);
 

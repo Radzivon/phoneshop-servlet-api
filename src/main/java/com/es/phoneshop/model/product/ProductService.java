@@ -7,22 +7,23 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ProductService {
-    private final String QUERY = "";
+    private static ProductService instance = new ProductService();
+    private final String MATCH_ALL_QUERY = "";
     private ProductDao productDao = ArrayListProductDao.getInstance();
 
+    public static ProductService getInstance() {
+        return instance;
+    }
+
     public List<Product> findProducts(String query, String sortBy, String order) {
-        Comparator<Product> comparator = null;
-        query = query == null ? QUERY : query;
-        comparator = "price".equals(sortBy)
-                ? "asc".equals(order)
-                ? ProductSortOption.SORT_PRICE : ProductSortOption.SORT_PRICE_DESC
-                : "description".equals(sortBy) ? "asc".equals(order)
-                ? ProductSortOption.SORT_DESCRIPTION : ProductSortOption.SORT_DESCRIPTION_DESC
-                : null;
+        query = query == null ? MATCH_ALL_QUERY : query;
+        String sortOption = sortBy + order;
+        Comparator<Product> comparator = ProductSortOption.getComparator(sortOption);
         if (comparator == null) {
-            return search(query).stream().collect(Collectors.toList());
+            return search(query);
         }
-        return search(query).stream().sorted(comparator).collect(Collectors.toList());
+        return  search(query).stream()
+                .sorted(comparator).collect(Collectors.toList());
     }
 
     private List<Product> search(String query) {
@@ -32,7 +33,7 @@ public class ProductService {
                         .filter(word -> product.getDescription().toLowerCase().contains(word)).count()))
                 .entrySet().stream()
                 .filter(map -> map.getValue() > 0)
-                .sorted((x, y) -> y.getValue().compareTo(x.getValue()))
+                .sorted(Comparator.comparing(Map.Entry<Product, Long>::getValue).reversed())
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
     }

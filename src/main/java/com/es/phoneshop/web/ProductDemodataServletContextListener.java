@@ -13,12 +13,12 @@ import java.util.Currency;
 import java.util.List;
 
 public class ProductDemodataServletContextListener implements ServletContextListener {
+    private ProductDao productDao = ArrayListProductDao.getInstance();;
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         String insertProductDemodata = servletContextEvent.getServletContext().getInitParameter("productDemodata");
         if ("true".equals(insertProductDemodata)) {
-            ProductDao productDao = ArrayListProductDao.getInstance();
             fillProductList().forEach(productDao::save);
         }
     }
@@ -28,7 +28,7 @@ public class ProductDemodataServletContextListener implements ServletContextList
 
     }
 
-   synchronized List<Product> fillProductList() {
+    synchronized List<Product> fillProductList() {
         List<Product> result = new ArrayList();
         Currency usd = Currency.getInstance("USD");
         Product product = new Product(1L, "sgs", "Samsung Galaxy S", new ArrayList<>(), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");
@@ -46,12 +46,12 @@ public class ProductDemodataServletContextListener implements ServletContextList
         product.getPrices().add(new ProductPrice("10 Oct 2018", new BigDecimal(350)));
         product.getPrices().add(new ProductPrice("1 Sep 2018", new BigDecimal(420)));
         result.add(product);
-        product = new Product(4L, "iphone", "Apple iPhone", new  ArrayList<>(), usd, 10, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Apple/Apple%20iPhone.jpg");
+        product = new Product(4L, "iphone", "Apple iPhone", new ArrayList<>(), usd, 10, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Apple/Apple%20iPhone.jpg");
         product.getPrices().add(new ProductPrice("10 Jan 2019", new BigDecimal(200)));
         product.getPrices().add(new ProductPrice("10 Oct 2018", new BigDecimal(250)));
         product.getPrices().add(new ProductPrice("1 Sep 2018", new BigDecimal(320)));
         result.add(product);
-        product = new Product(5L, "iphone6", "Apple iPhone 6",new ArrayList<>(), usd, 30, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Apple/Apple%20iPhone%206.jpg");
+        product = new Product(5L, "iphone6", "Apple iPhone 6", new ArrayList<>(), usd, 30, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Apple/Apple%20iPhone%206.jpg");
         product.getPrices().add(new ProductPrice("10 Jan 2019", new BigDecimal(1000)));
         product.getPrices().add(new ProductPrice("10 Oct 2018", new BigDecimal(1250)));
         product.getPrices().add(new ProductPrice("1 Sep 2018", new BigDecimal(1320)));
@@ -76,7 +76,7 @@ public class ProductDemodataServletContextListener implements ServletContextList
         product.getPrices().add(new ProductPrice("10 Oct 2018", new BigDecimal(100)));
         product.getPrices().add(new ProductPrice("1 Sep 2018", new BigDecimal(120)));
         result.add(product);
-        product = new Product(10L, "palmp", "Palm Pixi",new ArrayList<>(), usd, 30, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Palm/Palm%20Pixi.jpg");
+        product = new Product(10L, "palmp", "Palm Pixi", new ArrayList<>(), usd, 30, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Palm/Palm%20Pixi.jpg");
         product.getPrices().add(new ProductPrice("10 Jan 2019", new BigDecimal(170)));
         product.getPrices().add(new ProductPrice("10 Oct 2018", new BigDecimal(200)));
         product.getPrices().add(new ProductPrice("1 Sep 2018", new BigDecimal(220)));
@@ -86,7 +86,7 @@ public class ProductDemodataServletContextListener implements ServletContextList
         product.getPrices().add(new ProductPrice("10 Oct 2018", new BigDecimal(100)));
         product.getPrices().add(new ProductPrice("1 Sep 2018", new BigDecimal(120)));
         result.add(product);
-        product = new Product(12L, "simc61", "Siemens C61",new ArrayList<>(), usd, 30, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Siemens/Siemens%20C61.jpg");
+        product = new Product(12L, "simc61", "Siemens C61", new ArrayList<>(), usd, 30, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Siemens/Siemens%20C61.jpg");
         product.getPrices().add(new ProductPrice("10 Jan 2019", new BigDecimal(80)));
         product.getPrices().add(new ProductPrice("10 Oct 2018", new BigDecimal(110)));
         product.getPrices().add(new ProductPrice("1 Sep 2018", new BigDecimal(130)));

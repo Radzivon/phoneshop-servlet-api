@@ -3,24 +3,22 @@ package com.es.phoneshop.model.cart;
 import com.es.phoneshop.model.product.ArrayListProductDao;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.ProductDao;
+import com.es.phoneshop.model.product.ProductService;
 
-import javax.servlet.http.HttpServletRequest;
-import java.math.BigDecimal;
-import java.text.NumberFormat;
+import javax.servlet.http.HttpSession;
 import java.text.ParseException;
-import java.util.Locale;
 import java.util.Optional;
 
 public class HttpSessionCartService implements CartService {
     private static final String CART_SESSION_ATTRIBUTE = "cart";
     private static HttpSessionCartService instance = new HttpSessionCartService();
     private ProductDao productDao;
-    private AddToCartResult addToCartResult;
-    private static final String QUANTITY = "quantity";
+    private ProductService productService;
+
 
     private HttpSessionCartService() {
         productDao = ArrayListProductDao.getInstance();
-        addToCartResult = new AddToCartResult();
+        productService = ProductService.getInstance();
     }
 
     public static HttpSessionCartService getInstance() {
@@ -28,71 +26,118 @@ public class HttpSessionCartService implements CartService {
     }
 
     @Override
-    public Cart getCart(HttpServletRequest request) {
-        Cart cart = (Cart) request.getSession().getAttribute(CART_SESSION_ATTRIBUTE);
+    public Cart getCart(HttpSession session) {
+        Cart cart = (Cart) session.getAttribute(CART_SESSION_ATTRIBUTE);
         if (cart == null) {
             cart = new Cart();
-            request.getSession().setAttribute(CART_SESSION_ATTRIBUTE, cart);
+            session.setAttribute(CART_SESSION_ATTRIBUTE, cart);
         }
         return cart;
     }
 
     @Override
-    public boolean add(HttpServletRequest request) {
-        boolean isError = false;
-        Cart cart = getCart(request);
+    public AddCartResult add(HttpSession session, String stringProductId, String stringQuantity) {
+        boolean hasError = false;
+        Cart cart = getCart(session);
+        AddCartResult addCartResult = new AddCartResult();
+        Long productId;
+        int quantity;
+
         try {
-            int quantity = parseQuantity(request);
-
-            Long productId = parseProductId(request);
-            Product product = productDao.getProduct(productId);
-            if (quantity > product.getStock()) {
-                throw new OutOfStockException(product.getStock());
-            }
-            Optional<CartItem> optionalCartItem = cart.getCartItems().stream()
-                    .filter(cartItem -> cartItem.getProductId().equals(product.getId())).findFirst();
-            if (optionalCartItem.isPresent()) {
-                CartItem cartItem = optionalCartItem.get();
-                int totalQuantity = cartItem.getQuantity() + quantity;
-                cartItem.setQuantity(totalQuantity);
-            } else {
-                cart.getCartItems().add(new CartItem(product.getId(), quantity));
-            }
-
-            recalculateCart(cart);
-
-            addToCartResult.setCart(cart);
-            addToCartResult.setProduct(product);
-
+            productId = parseProductId(stringProductId);
+            quantity = parseQuantity(stringQuantity);
         } catch (NumberFormatException | ParseException exception) {
-            addToCartResult.setErrorMessage("Not a number");
-            isError = true;
-        } catch (OutOfStockException exception) {
-            addToCartResult.setErrorMessage("Out of stock. Max stock is " + exception.getMaxStock());
-            isError = true;
+            hasError = true;
+            addCartResult.setErrorMessage("Not a number");
+            addCartResult.setHasError(hasError);
+            return addCartResult;
         }
-        return isError;
-    }
+        Product product = productDao.getProduct(productId);
 
-    private void recalculateCart(Cart cart) {
-        BigDecimal totalCost = new BigDecimal(0);
-        Integer totalQuantity = new Integer(0);
-        for (CartItem cartItem : cart.getCartItems()) {
-            totalCost = totalCost.add(ArrayListProductDao.getInstance().getProduct(cartItem.getProductId()).getPrice()
-                    .multiply(new BigDecimal(cartItem.getQuantity())));
-            totalQuantity += cartItem.getQuantity();
+        if (quantity > product.getStock()) {
+            hasError = true;
+            addCartResult.setErrorMessage("Out of stock. Max stock is " + product.getStock());
+            addCartResult.setHasError(hasError);
+            return addCartResult;
         }
-        cart.setTotalCost(totalCost);
-        cart.setTotalQuantity(totalQuantity);
+
+        Optional<CartItem> optionalCartItem = cart.getCartItems().stream()
+                .filter(cartItem -> cartItem.getProduct().equals(product)).findFirst();
+        if (optionalCartItem.isPresent()) {
+            CartItem cartItem = optionalCartItem.get();
+            int totalQuantity = cartItem.getQuantity() + quantity;
+            cartItem.setQuantity(totalQuantity);
+        } else {
+            cart.getCartItems().add(new CartItem(product, quantity));
+        }
+
+        cart.recalculateCart();
+
+        addCartResult.setCart(cart);
+        addCartResult.setProduct(product);
+        addCartResult.setHasError(hasError);
+        return addCartResult;
     }
 
-    Long parseProductId(HttpServletRequest request) {
-        return Long.valueOf(request.getPathInfo()
-                .substring(1));
+    @Override
+    public UpdateCartResult update(HttpSession session, String[] productIds, String[] quantities) {
+        UpdateCartResult updateCartResult = new UpdateCartResult();
+
+        boolean hasError = false;
+        Cart cart = getCart(session);
+        String[] errors = new String[productIds.length];
+        for (int i = 0; i < productIds.length; i++) {
+            Long productId = Long.valueOf(productIds[i]);
+            int quantity;
+            try {
+                quantity = Integer.valueOf(quantities[i]);
+            } catch (NumberFormatException exception) {
+                errors[i] = "Not a number";
+                hasError = true;
+                continue;
+            }
+
+            boolean checkError = update(cart, productId, quantity);
+            if (checkError) {
+                errors[i] = "Out of stock. Max stock is " + productService.getProductById(productId).getStock();
+                hasError = true;
+            }
+        }
+        updateCartResult.setCart(cart);
+        updateCartResult.setHasError(hasError);
+        updateCartResult.setErrors(errors);
+        return updateCartResult;
     }
 
-    int parseQuantity(HttpServletRequest request) throws ParseException {
-        Locale locale = request.getLocale();
-        return NumberFormat.getInstance(locale).parse(request.getParameter(QUANTITY)).intValue();
+    private boolean update(Cart cart, Long productId, int quantity) {
+        boolean hasError = false;
+        Product product = productService.getProductById(productId);
+        if (quantity > product.getStock()) {
+            hasError = true;
+            return hasError;
+        }
+        cart.getCartItems().stream()
+                .filter(cartItem -> cartItem.getProduct().equals(product)).findFirst()
+                .ifPresent(cartItem -> cartItem.setQuantity(quantity));
+
+        cart.recalculateCart();
+        return hasError;
+    }
+
+    @Override
+    public void delete(HttpSession session, String stringProductId) {
+        Cart cart = getCart(session);
+        Long productId = parseProductId(stringProductId);
+
+        cart.getCartItems().removeIf(cartItem -> cartItem.getProduct().getId().equals(productId));
+        cart.recalculateCart();
+    }
+
+    Long parseProductId(String stringProductId) {
+        return Long.valueOf(stringProductId);
+    }
+
+    int parseQuantity(String quantity) throws ParseException {
+        return Integer.valueOf(quantity);
     }
 }

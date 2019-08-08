@@ -41,7 +41,39 @@
         <servlet-name>productPriceHistory</servlet-name>
         <url-pattern>/products/prices/*</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>cartPageServlet</servlet-name>
+        <servlet-class>com.es.phoneshop.web.CartPageServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>cartPageServlet</servlet-name>
+        <url-pattern>/cart</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>cartItemDeleteServlet</servlet-name>
+        <servlet-class>com.es.phoneshop.web.CartItemDeleteServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>cartItemDeleteServlet</servlet-name>
+        <url-pattern>/cart/deleteCartItem/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>minicart</servlet-name>
+        <servlet-class>com.es.phoneshop.web.MiniCartServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>minicart</servlet-name>
+        <url-pattern>/minicart</url-pattern>
+    </servlet-mapping>
+
     <error-page>
-        <location id="com.es.phoneshop.model.product.ProductNotFoundException">/WEB-INF/pages/ProductNotFound.jsp</location>
+        <location id="com.es.phoneshop.model.product.ProductNotFoundException">/WEB-INF/pages/ProductNotFound.jsp
+        </location>
     </error-page>
 </web-app>
