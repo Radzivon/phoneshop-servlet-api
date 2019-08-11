@@ -11,7 +11,7 @@ public class ArrayListOrderDao implements OrderDao {
         orderList = new CopyOnWriteArrayList<>();
     }
 
-    public static OrderDao getInstance() {
+    public static ArrayListOrderDao getInstance() {
         return instance;
     }
 

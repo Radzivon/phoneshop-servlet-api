@@ -96,7 +96,7 @@ public class CheckOutPageServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/order/overview/" + order.getId());
         } else {
             request.setAttribute("hasError", hasError);
-            request.setAttribute("order", order);
+            request.setAttribute(ORDER, order);
             request.getRequestDispatcher(JSP_PATH).forward(request, response);
         }
     }

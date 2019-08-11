@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class DosProtectionServiceImpl implements DosProtectionService {
-    private static DosProtectionService instance = new DosProtectionServiceImpl();
+    private static DosProtectionServiceImpl instance = new DosProtectionServiceImpl();
 
     private static long MAX_REQUEST_COUNT = 500;
     private static long TEN_MINUTES = 600000;
@@ -18,7 +18,7 @@ public class DosProtectionServiceImpl implements DosProtectionService {
         countMap = Collections.synchronizedMap(new HashMap<>());
     }
 
-    public static DosProtectionService getInstance() {
+    public static DosProtectionServiceImpl getInstance() {
         return instance;
     }
 

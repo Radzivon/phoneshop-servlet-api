@@ -1,8 +1,6 @@
 package com.es.phoneshop.model.order;
 
 import com.es.phoneshop.model.cart.Cart;
-import com.es.phoneshop.model.cart.CartItem;
-import com.es.phoneshop.model.product.Product;
 
 import java.util.ArrayList;
 import java.util.Calendar;
