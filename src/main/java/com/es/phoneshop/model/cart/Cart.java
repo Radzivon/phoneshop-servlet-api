@@ -8,12 +8,12 @@ import java.util.Locale;
 
 public class Cart {
     private List<CartItem> cartItems;
-    private BigDecimal totalCost;
+    private BigDecimal subTotalCost;
     private int totalQuantity;
 
     public Cart() {
         cartItems = new ArrayList<>();
-        totalCost = new BigDecimal(0);
+        subTotalCost = new BigDecimal(0);
     }
 
     public List<CartItem> getCartItems() {
@@ -24,12 +24,12 @@ public class Cart {
         this.cartItems = cartItems;
     }
 
-    public BigDecimal getTotalCost() {
-        return totalCost;
+    public BigDecimal getSubTotalCost() {
+        return subTotalCost;
     }
 
-    public void setTotalCost(BigDecimal totalCost) {
-        this.totalCost = totalCost;
+    public void setSubTotalCost(BigDecimal subTotalCost) {
+        this.subTotalCost = subTotalCost;
     }
 
     public int getTotalQuantity() {
@@ -48,12 +48,7 @@ public class Cart {
                     .multiply(new BigDecimal(cartItem.getQuantity())));
             totalQuantity += cartItem.getQuantity();
         }
-        this.totalCost = totalCost;
+        this.subTotalCost = totalCost;
         this.totalQuantity = totalQuantity;
-    }
-
-    @Override
-    public String toString() {
-        return "Quantity: " + totalQuantity + " Total: " + totalCost + Currency.getInstance(Locale.US) + cartItems;
     }
 }
