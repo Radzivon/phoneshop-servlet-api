@@ -2,9 +2,8 @@ package com.es.phoneshop.model.order;
 
 import com.es.phoneshop.model.cart.Cart;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.UUID;
 
 public class OrderServiceImpl implements OrderService {
@@ -12,6 +11,7 @@ public class OrderServiceImpl implements OrderService {
     private OrderDao orderDao;
     private int numberOfDaysForDelivery = 1;
     private int deliveryHour = 9;
+
     public OrderServiceImpl() {
         orderDao = ArrayListOrderDao.getInstance();
     }
@@ -27,7 +27,7 @@ public class OrderServiceImpl implements OrderService {
         order.setSubTotalCost(cart.getSubTotalCost());
         order.setTotalQuantity(cart.getTotalQuantity());
 
-        Date tomorrow = getTomorrowDate();
+        LocalDate tomorrow = getTomorrowDate();
         order.setDeliveryDate(tomorrow);
 
         return order;
@@ -39,14 +39,8 @@ public class OrderServiceImpl implements OrderService {
         orderDao.save(order);
     }
 
-    private Date getTomorrowDate() {
-        Calendar calendar = Calendar.getInstance();
-        Date today = new Date(System.currentTimeMillis());
-        calendar.setTime(today);
-        calendar.add(Calendar.DATE, numberOfDaysForDelivery);
-        calendar.set(Calendar.HOUR, deliveryHour);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        return calendar.getTime();
+    private LocalDate getTomorrowDate() {
+        LocalDate today = LocalDate.now();
+        return today.plusDays(numberOfDaysForDelivery);
     }
 }

@@ -18,7 +18,7 @@ public class ArrayListOrderDao implements OrderDao {
     @Override
     public void save(Order order) {
         if (order == null) {
-            throw new IllegalArgumentException("Order is null");
+            throw new OrderNotFoundException("Sorry! Order doesn't found!");
         }
         orderList.add(order);
     }

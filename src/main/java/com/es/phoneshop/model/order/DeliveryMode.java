@@ -18,7 +18,7 @@ public enum DeliveryMode {
                 return deliveryMode;
             }
         }
-        return null;
+        return STORE_PICK_UP;
     }
 
     public BigDecimal getDeliveryCost() {

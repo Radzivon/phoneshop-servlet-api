@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.math.BigDecimal;
+import java.util.Map;
 
 public class CheckOutPageServlet extends HttpServlet {
     private CartService cartService;
@@ -43,59 +43,25 @@ public class CheckOutPageServlet extends HttpServlet {
         Cart cart = cartService.getCart(session);
         Order order = orderService.getOrder(cart);
 
-        boolean hasError = false;
+        OrderValidator orderValidator = new OrderValidator();
         String firstName = request.getParameter("firstName");
-        if (firstName != null && !firstName.equals("")) {
-            order.setFirstName(firstName);
-        } else {
-            hasError = true;
-            request.setAttribute("errorFirstName", "Incorrect value");
-        }
-
         String lastName = request.getParameter("lastName");
-        if (lastName != null && !lastName.equals("")) {
-            order.setLastName(lastName);
-        } else {
-            hasError = true;
-            request.setAttribute("errorLastName", "Incorrect value");
-        }
-
-
         String phoneNumber = request.getParameter("phoneNumber");
-        if (phoneNumber != null && !phoneNumber.equals("") && ValidPhoneNumber.isPhoneNumber(phoneNumber)) {
-            order.setPhoneNumber(phoneNumber);
-        } else {
-            hasError = true;
-            request.setAttribute("errorPhoneNumber", "Incorrect value");
-        }
-
         String stringDeliveryMode = request.getParameter("deliveryMode");
-        DeliveryMode deliveryMode = DeliveryMode.getDeliveryMode(stringDeliveryMode);
-        order.setDeliveryMode(deliveryMode);
-
-        BigDecimal deliveryCost = deliveryMode.getDeliveryCost();
-        order.setDeliveryCost(deliveryCost);
-
-        order.calculateTotalCost();
-
         String deliveryAddress = request.getParameter("deliveryAddress");
-        if (deliveryAddress != null && !deliveryAddress.equals("")) {
-            order.setDeliveryAddress(deliveryAddress);
-        } else {
-            hasError = true;
-            request.setAttribute("errorDeliveryAddress", "Incorrect value");
-        }
-
         String stringPaymentMethod = request.getParameter("paymentMethod");
-        PaymentMethod paymentMethod = PaymentMethod.getPaymentMethod(stringPaymentMethod);
-        order.setPaymentMethod(paymentMethod);
 
-        if (!hasError) {
+        ValidOrderResult validOrderResult = orderValidator.validOrder(order, firstName, lastName, phoneNumber, stringDeliveryMode, deliveryAddress, stringPaymentMethod);
+
+        if (!validOrderResult.hasError()) {
             orderService.placeOrder(order);
             cartService.clearCart(cart);
             response.sendRedirect(request.getContextPath() + "/order/overview/" + order.getId());
         } else {
-            request.setAttribute("hasError", hasError);
+            request.setAttribute("hasError", validOrderResult.hasError());
+            for (Map.Entry<String, String> entry : validOrderResult.getMapErrors().entrySet()) {
+                request.setAttribute(entry.getKey(), entry.getValue());
+            }
             request.setAttribute(ORDER, order);
             request.getRequestDispatcher(JSP_PATH).forward(request, response);
         }

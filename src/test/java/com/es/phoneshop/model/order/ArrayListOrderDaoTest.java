@@ -1,5 +1,6 @@
 package com.es.phoneshop.model.order;
 
+import com.es.phoneshop.model.product.ProductNotFoundException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,7 +38,7 @@ public class ArrayListOrderDaoTest {
         Assert.assertNotNull(temp);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = OrderNotFoundException.class)
     public void saveThrowIllegalArgumentException() {
         Order temp = null;
         arrayListOrderDao.save(temp);

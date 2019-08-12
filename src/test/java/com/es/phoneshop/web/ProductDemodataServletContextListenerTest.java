@@ -29,7 +29,7 @@ public class ProductDemodataServletContextListenerTest {
     private Product product;
     @Mock
     private ProductDao productDao;
-
+    @Spy
     @InjectMocks
     private ProductDemodataServletContextListener productDemodataServletContextListener;
 
@@ -38,12 +38,10 @@ public class ProductDemodataServletContextListenerTest {
         when(servletContextEvent.getServletContext()).thenReturn(servletContext);
     }
 
-    @Ignore
     @Test
     public void testFillProductList() {
         when(servletContextEvent.getServletContext().getInitParameter("productDemodata")).thenReturn("true");
-       // doReturn(Collections.singletonList(product)).when(productDemodataServletContextListener).fillProductList();
-        when(productDemodataServletContextListener.fillProductList()).thenReturn(Collections.singletonList(product));
+       doReturn(Collections.singletonList(product)).when(productDemodataServletContextListener).fillProductList();
 
         productDemodataServletContextListener.contextInitialized(servletContextEvent);
 

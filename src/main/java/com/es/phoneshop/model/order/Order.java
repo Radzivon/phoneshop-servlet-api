@@ -3,7 +3,7 @@ package com.es.phoneshop.model.order;
 import com.es.phoneshop.model.cart.Cart;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 
 public class Order extends Cart {
     private String id;
@@ -13,7 +13,7 @@ public class Order extends Cart {
     private String deliveryAddress;
     private PaymentMethod paymentMethod;
     private DeliveryMode deliveryMode;
-    private Date deliveryDate;
+    private LocalDate deliveryDate;
     private BigDecimal deliveryCost;
     private BigDecimal totalCost;
 
@@ -65,11 +65,11 @@ public class Order extends Cart {
         this.deliveryMode = deliveryMode;
     }
 
-    public Date getDeliveryDate() {
+    public LocalDate getDeliveryDate() {
         return deliveryDate;
     }
 
-    public void setDeliveryDate(Date deliveryDate) {
+    public void setDeliveryDate(LocalDate deliveryDate) {
         this.deliveryDate = deliveryDate;
     }
 

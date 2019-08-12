@@ -36,7 +36,7 @@ public class ArrayListProductDao implements ProductDao {
     @Override
     public void save(Product product) {
         if (product == null) {
-            throw new IllegalArgumentException("Product is null");
+            throw new ProductNotFoundException("Product is null");
         }
         productList.add(product);
     }

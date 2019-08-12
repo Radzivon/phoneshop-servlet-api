@@ -14,6 +14,6 @@ public enum PaymentMethod {
                 return paymentMethod;
             }
         }
-        return null;
+        return CASH;
     }
 }
