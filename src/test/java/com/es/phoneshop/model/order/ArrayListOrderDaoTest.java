@@ -38,7 +38,7 @@ public class ArrayListOrderDaoTest {
         Assert.assertNotNull(temp);
     }
 
-    @Test(expected = OrderNotFoundException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void saveThrowIllegalArgumentException() {
         Order temp = null;
         arrayListOrderDao.save(temp);
@@ -62,7 +62,7 @@ public class ArrayListOrderDaoTest {
         verify(order).getId();
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test(expected = OrderNotFoundException.class)
     public void getByIdWithNoSuchElementException() {
         orderList.add(order);
         when(order.getId()).thenReturn(id);

@@ -56,16 +56,8 @@ public class ProductServiceTest {
     }
 
     @Test
-    public void testFindProductsNullParam() {
-        productService.findProducts(query, sortBy, order);
-
-        Assert.assertEquals(productList, productService.findProducts(query, sortBy, order));
-    }
-
-    @Test
     public void testFindProductsQueryNotNull() {
         query = "a";
-        productService.findProducts(query, sortBy, order);
 
         Assert.assertNotEquals(productList, productService.findProducts(query, sortBy, order));
     }
@@ -74,7 +66,6 @@ public class ProductServiceTest {
     public void testFindProductsSortByDescriptionAsc() {
         sortBy = "description";
         order = "asc";
-        productService.findProducts(query, sortBy, order);
 
         Assert.assertEquals(productList, productService.findProducts(query, sortBy, order));
     }
@@ -82,7 +73,6 @@ public class ProductServiceTest {
     public void testFindProductsSortByDescriptionDesc() {
         sortBy = "description";
         order = "desc";
-        productService.findProducts(query, sortBy, order);
 
         Assert.assertNotEquals(productList, productService.findProducts(query, sortBy, order));
     }
@@ -90,7 +80,6 @@ public class ProductServiceTest {
     public void testFindProductsSortByPriceAsc() {
         sortBy = "price";
         order = "asc";
-        productService.findProducts(query, sortBy, order);
 
         Assert.assertNotEquals(productList, productService.findProducts(query, sortBy, order));
     }
@@ -98,7 +87,6 @@ public class ProductServiceTest {
     public void testFindProductsSortByPriceDesc() {
         sortBy = "price";
         order = "desc";
-        productService.findProducts(query, sortBy, order);
 
         Assert.assertEquals(productList, productService.findProducts(query, sortBy, order));
     }
