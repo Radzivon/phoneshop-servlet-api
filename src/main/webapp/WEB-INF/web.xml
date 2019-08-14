@@ -101,6 +101,16 @@
         <url-pattern>/order/overview/*</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>advancesSearchPage</servlet-name>
+        <servlet-class>com.es.phoneshop.web.AdvancedSearchPageServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>advancesSearchPage</servlet-name>
+        <url-pattern>/search</url-pattern>
+    </servlet-mapping>
+
     <error-page>
         <exception-type>com.es.phoneshop.model.product.ProductNotFoundException</exception-type>
         <location>/WEB-INF/pages/ProductNotFound.jsp</location>
