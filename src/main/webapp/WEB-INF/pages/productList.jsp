@@ -12,6 +12,7 @@
         <input name="query" value="${param.query}">
         <button>Search</button>
     </form>
+    <a href="<c:url value="/search"/>">Search filter</a>
     <table class="table-responsive">
         <thead>
         <tr>
