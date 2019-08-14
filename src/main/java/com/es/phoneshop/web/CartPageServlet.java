@@ -17,7 +17,6 @@ public class CartPageServlet extends HttpServlet {
     private static final String JSP_PATH = "/WEB-INF/pages/cart.jsp";
     private static final String CART = "cart";
     private static final String URL_MESSAGE = "?message=Updated successfully";
-    private static final String QUANTITY = "quantity";
 
     @Override
     public void init() {

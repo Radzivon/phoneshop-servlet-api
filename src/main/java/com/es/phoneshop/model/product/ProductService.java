@@ -26,7 +26,7 @@ public class ProductService {
                 .sorted(comparator).collect(Collectors.toList());
     }
 
-    private List<Product> search(String query) {
+     List<Product> search(String query) {
         String[] wordsForSearch = query.toLowerCase().split("\\s+");
         return productDao.findProducts().stream()
                 .collect(Collectors.toMap(product -> product, product -> Arrays.stream(wordsForSearch)

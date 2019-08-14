@@ -12,6 +12,15 @@
         <listener-class>com.es.phoneshop.web.ProductDemodataServletContextListener</listener-class>
     </listener>
 
+    <filter>
+        <filter-name>dos</filter-name>
+        <filter-class>com.es.phoneshop.web.filter.DosFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>dos</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
     <servlet>
         <servlet-name>productList</servlet-name>
         <servlet-class>com.es.phoneshop.web.ProductListPageServlet</servlet-class>
@@ -72,8 +81,32 @@
         <url-pattern>/minicart</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>checkout</servlet-name>
+        <servlet-class>com.es.phoneshop.web.CheckOutPageServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>checkout</servlet-name>
+        <url-pattern>/checkout</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>orderOverview</servlet-name>
+        <servlet-class>com.es.phoneshop.web.OrderOverviewPageServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>orderOverview</servlet-name>
+        <url-pattern>/order/overview/*</url-pattern>
+    </servlet-mapping>
+
     <error-page>
         <location id="com.es.phoneshop.model.product.ProductNotFoundException">/WEB-INF/pages/ProductNotFound.jsp
+        </location>
+    </error-page>
+    <error-page>
+        <location id="com.es.phoneshop.model.order.OrderNotFoundException">/WEB-INF/pages/orderNotFoundException.jsp
         </location>
     </error-page>
 </web-app>

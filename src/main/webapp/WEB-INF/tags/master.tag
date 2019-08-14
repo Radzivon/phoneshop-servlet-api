@@ -23,7 +23,7 @@
 </header>
 <main>
     <jsp:doBody/>
-    <p class="text">Recently viewed</p>
+    <p class="text" style="font-weight: bold">Recently viewed</p>
     <div class="row">
         <c:forEach var="product" items="${recentlyviewed}">
             <div class="col-1">

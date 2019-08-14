@@ -75,7 +75,7 @@ public class ArrayListProductDaoTest {
         Assert.assertEquals(expectedSize, productDao.findProducts().size());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ProductNotFoundException.class)
     public void testSaveProductNull() {
         productDao.save(null);
     }

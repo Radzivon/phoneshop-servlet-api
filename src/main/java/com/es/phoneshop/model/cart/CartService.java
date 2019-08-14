@@ -7,4 +7,5 @@ public interface CartService {
     AddCartResult add(HttpSession session, String stringProductId, String stringQuantity);
     UpdateCartResult update(HttpSession session, String[] productIds, String[] quantities);
     void delete(HttpSession httpSession, String stringProductId);
+    void clearCart(Cart cart);
 }

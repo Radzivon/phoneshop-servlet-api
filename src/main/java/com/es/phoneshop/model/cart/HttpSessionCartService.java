@@ -6,6 +6,7 @@ import com.es.phoneshop.model.product.ProductDao;
 import com.es.phoneshop.model.product.ProductService;
 
 import javax.servlet.http.HttpSession;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Optional;
 
@@ -61,6 +62,8 @@ public class HttpSessionCartService implements CartService {
             return addCartResult;
         }
 
+        product.setStock(product.getStock() - quantity);
+
         Optional<CartItem> optionalCartItem = cart.getCartItems().stream()
                 .filter(cartItem -> cartItem.getProduct().equals(product)).findFirst();
         if (optionalCartItem.isPresent()) {
@@ -112,10 +115,18 @@ public class HttpSessionCartService implements CartService {
     private boolean update(Cart cart, Long productId, int quantity) {
         boolean hasError = false;
         Product product = productService.getProductById(productId);
+        int oldQuantity = cart.getCartItems().stream()
+                .filter(cartItem -> cartItem.getProduct().equals(product))
+                .findFirst().get().getQuantity();
+
+        product.setStock(product.getStock() + oldQuantity);
         if (quantity > product.getStock()) {
             hasError = true;
             return hasError;
         }
+
+        product.setStock(product.getStock() - quantity);
+
         cart.getCartItems().stream()
                 .filter(cartItem -> cartItem.getProduct().equals(product)).findFirst()
                 .ifPresent(cartItem -> cartItem.setQuantity(quantity));
@@ -128,9 +139,22 @@ public class HttpSessionCartService implements CartService {
     public void delete(HttpSession session, String stringProductId) {
         Cart cart = getCart(session);
         Long productId = parseProductId(stringProductId);
+        Product product = productDao.getProduct(productId);
 
-        cart.getCartItems().removeIf(cartItem -> cartItem.getProduct().getId().equals(productId));
+        int quantity = cart.getCartItems().stream()
+                .filter(cartItem -> cartItem.getProduct().equals(product))
+                .findFirst().get().getQuantity();
+
+        cart.getCartItems().removeIf(cartItem -> cartItem.getProduct().equals(product));
+        product.setStock(product.getStock() + quantity);
         cart.recalculateCart();
+    }
+
+    @Override
+    public void clearCart(Cart cart) {
+        cart.getCartItems().clear();
+        cart.setSubTotalCost(new BigDecimal(0));
+        cart.setTotalQuantity(0);
     }
 
     Long parseProductId(String stringProductId) {
