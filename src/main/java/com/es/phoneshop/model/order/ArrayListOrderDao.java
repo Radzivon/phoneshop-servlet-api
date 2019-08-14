@@ -1,6 +1,7 @@
 package com.es.phoneshop.model.order;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ArrayListOrderDao implements OrderDao {
@@ -18,13 +19,13 @@ public class ArrayListOrderDao implements OrderDao {
     @Override
     public void save(Order order) {
         if (order == null) {
-            throw new OrderNotFoundException("Sorry! Order doesn't found!");
+            throw new IllegalArgumentException("Sorry! Order doesn't found!");
         }
         orderList.add(order);
     }
 
     @Override
     public Order getById(String id) {
-        return orderList.stream().filter(order -> order.getId().equals(id)).findFirst().get();
+        return orderList.stream().filter(order -> order.getId().equals(id)).findFirst().orElseThrow(() -> new OrderNotFoundException("Sorry! Order doesn't found!"));
     }
 }

@@ -102,11 +102,11 @@
     </servlet-mapping>
 
     <error-page>
-        <location id="com.es.phoneshop.model.product.ProductNotFoundException">/WEB-INF/pages/ProductNotFound.jsp
-        </location>
+        <exception-type>com.es.phoneshop.model.product.ProductNotFoundException</exception-type>
+        <location>/WEB-INF/pages/ProductNotFound.jsp</location>
     </error-page>
     <error-page>
-        <location id="com.es.phoneshop.model.order.OrderNotFoundException">/WEB-INF/pages/orderNotFoundException.jsp
-        </location>
+        <exception-type>com.es.phoneshop.model.order.OrderNotFoundException</exception-type>
+        <location>/WEB-INF/pages/orderNotFoundException.jsp</location>
     </error-page>
 </web-app>
